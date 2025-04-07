@@ -4,6 +4,16 @@
 
 > 使用JavaFx开发的本地截图工具。
 > 截图框选后进行OCR识别，OCR引擎使用RapidOCR，默认使用ONNX V4模型。
+> PS: 为了使用高精度版本的OCR模型，这里从原github项目上Fork了新项目，需要拉取到本地后，先增加Server版本的高精度Model，然后自行打包依赖。
+
+> 项目地址：``https://github.com/WZJ-Study/RapidOcr-Java``
+
+> 原项目中未添加高精度的OCR模型的说明：
+> # models
+> Due to file size limitations, the server model is not added by default.
+> If you need the server model, please download it from here and add it to the current directory, then repackage.
+> - https://huggingface.co/SWHL/RapidOCR/tree/main/PP-OCRv4
+
 
 ## 占用本地端口
 8888

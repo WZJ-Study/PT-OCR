@@ -77,13 +77,13 @@
             <optional>true</optional>
         </dependency>
 
-<!--        &lt;!&ndash; 以下是 postgres数据库 组件 &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.postgresql</groupId>-->
-<!--            <artifactId>postgresql</artifactId>-->
-<!--            <version>${postgres.version}</version>-->
-<!--            <scope>runtime</scope>-->
-<!--        </dependency>-->
+        <!--        &lt;!&ndash; 以下是 postgres数据库 组件 &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>org.postgresql</groupId>-->
+        <!--            <artifactId>postgresql</artifactId>-->
+        <!--            <version>${postgres.version}</version>-->
+        <!--            <scope>runtime</scope>-->
+        <!--        </dependency>-->
 
         <!-- 以下是 sqlite数据库 组件 -->
         <dependency>
@@ -93,12 +93,12 @@
         </dependency>
 
 
-<!--        &lt;!&ndash; 以下是 mybatis-plus 组件 &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.baomidou</groupId>-->
-<!--            <artifactId>mybatis-plus-boot-starter</artifactId>-->
-<!--            <version>${mybatis-plus.version}</version>-->
-<!--        </dependency>-->
+        <!--        &lt;!&ndash; 以下是 mybatis-plus 组件 &ndash;&gt;-->
+        <!--        <dependency>-->
+        <!--            <groupId>com.baomidou</groupId>-->
+        <!--            <artifactId>mybatis-plus-boot-starter</artifactId>-->
+        <!--            <version>${mybatis-plus.version}</version>-->
+        <!--        </dependency>-->
 
         <!-- https://mvnrepository.com/artifact/org.springframework.boot/spring-boot-starter-jdbc -->
         <dependency>
@@ -141,7 +141,6 @@
         </dependency>
 
 
-
         <!-- 以下是 JavaFX 组件 -->
         <dependency>
             <groupId>org.openjfx</groupId>
@@ -167,15 +166,15 @@
             <version>11-r2</version>
         </dependency>
 
-
         <!--  以下是 RapidOCR 组件 （github Fork重写）  -->
         <dependency>
-            <groupId>io.github.mymonstercat</groupId>
+            <groupId>cc.wangzijie</groupId>
             <artifactId>rapidocr</artifactId>
             <version>${rapidocr.version}</version>
         </dependency>
+
         <dependency>
-            <groupId>io.github.mymonstercat</groupId>
+            <groupId>cc.wangzijie</groupId>
             <artifactId>rapidocr-onnx-platform</artifactId>
             <version>${rapidocr.version}</version>
         </dependency>
@@ -246,11 +245,11 @@
                     <!-- 不使用管理员身份打开程序 -->
                     <administratorRequired>false</administratorRequired>
 
-<!--                    &lt;!&ndash;  添加精简jre缺少的模块  &ndash;&gt;-->
-<!--                    <additionalModules>-->
-<!--                        &lt;!&ndash;  我这里自动生成的精简jre缺少这个模块，运行会报错  &ndash;&gt;-->
-<!--                        <additionalModule>spring.boot.autoconfigure</additionalModule>-->
-<!--                    </additionalModules>-->
+                    <!--                    &lt;!&ndash;  添加精简jre缺少的模块  &ndash;&gt;-->
+                    <!--                    <additionalModules>-->
+                    <!--                        &lt;!&ndash;  我这里自动生成的精简jre缺少这个模块，运行会报错  &ndash;&gt;-->
+                    <!--                        <additionalModule>spring.boot.autoconfigure</additionalModule>-->
+                    <!--                    </additionalModules>-->
                     <!--                            &lt;!&ndash; 将指定文件夹包含到生成的程序路径 &ndash;&gt;-->
                     <!--                            <additionalResources>-->
                     <!--                                <additionalResource>D:\projects\aio\config</additionalResource>-->

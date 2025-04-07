@@ -101,7 +101,7 @@ public class OCRManager {
         this.settingsWindowModel = settingsWindowModel;
         this.ocrSectionResultService = ocrSectionResultService;
         this.serverConfig = serverConfig;
-        this.ocrEngine = InferenceEngine.getInstance(Model.ONNX_PPOCR_V4);
+        this.ocrEngine = InferenceEngine.getInstance(Model.ONNX_PPOCR_V4_SERVER);
         // 默认时间间隔：5s
         this.intervalSeconds = Constants.DEFAULT_INTERVAL_SECONDS;
         this.countDownSeconds = new AtomicInteger(0);
