@@ -166,6 +166,18 @@
             <version>11-r2</version>
         </dependency>
 
+<!--        &lt;!&ndash;  以下是 RapidOCR 组件  &ndash;&gt;-->
+<!--        <dependency>-->
+<!--            <groupId>io.github.mymonstercat</groupId>-->
+<!--            <artifactId>rapidocr</artifactId>-->
+<!--            <version>${rapidocr.version}</version>-->
+<!--        </dependency>-->
+<!--        <dependency>-->
+<!--            <groupId>io.github.mymonstercat</groupId>-->
+<!--            <artifactId>rapidocr-onnx-platform</artifactId>-->
+<!--            <version>${rapidocr.version}</version>-->
+<!--        </dependency>-->
+
         <!--  以下是 RapidOCR 组件 （github Fork重写）  -->
         <dependency>
             <groupId>cc.wangzijie</groupId>
@@ -257,12 +269,11 @@
                     <!--                                <additionalResource>D:\projects\aio\parameter</additionalResource>-->
                     <!--                            </additionalResources>-->
 
-                    <!--                            &lt;!&ndash; 虚拟机参数 &ndash;&gt;-->
-                    <!--                            <vmArgs>-->
-                    <!--                                <vmArg>-Dfile.encoding=utf-8</vmArg>-->
-                    <!--                                <vmArg>&#45;&#45;add-opens java.base/java.lang=ALL-UNNAMED</vmArg>-->
-                    <!--                            </vmArgs>-->
-
+                    <!-- 虚拟机参数 -->
+                    <vmArgs>
+                        <vmArg>-Dfile.encoding=utf-8</vmArg>
+                        <vmArg>-Xmx128m</vmArg>
+                    </vmArgs>
 
                     <!-- 特定平台参数 -->
                     <winConfig>
