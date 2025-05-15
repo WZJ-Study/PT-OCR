@@ -22,6 +22,8 @@ public class SettingsWindowModel {
 
     private final BooleanProperty databaseEnabledFlag = new SimpleBooleanProperty(true);
 
+    private final StringProperty updateStatusHookUrl = new SimpleStringProperty();
+
     public Image getCloseWindowButtonImage() {
         return closeWindowButtonImage.get();
     }
@@ -117,4 +119,17 @@ public class SettingsWindowModel {
     public void setDatabaseEnabledFlag(boolean databaseEnabledFlag) {
         this.databaseEnabledFlag.set(databaseEnabledFlag);
     }
+
+    public String getUpdateStatusHookUrl() {
+        return updateStatusHookUrl.get();
+    }
+
+    public StringProperty updateStatusHookUrlProperty() {
+        return updateStatusHookUrl;
+    }
+
+    public void setUpdateStatusHookUrl(String updateStatusHookUrl) {
+        this.updateStatusHookUrl.set(updateStatusHookUrl);
+    }
+
 }

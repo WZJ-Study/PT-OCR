@@ -36,4 +36,10 @@ public class DataController {
         return jsonData;
     }
 
+    @PostMapping("/update-status")
+    public String updateStatus(@RequestBody String jsonData) {
+        log.info("==== updateStatus ==== 接收到JSON数据： {}", jsonData);
+        return jsonData;
+    }
+
 }

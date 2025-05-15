@@ -1,13 +1,21 @@
 package cc.wangzijie.ui.view;
 
 
+import cc.wangzijie.config.ServerConfig;
 import cc.wangzijie.constants.Constants;
 import cc.wangzijie.fxml.FxmlViews;
 import cc.wangzijie.fxml.loader.SpringFxmlLoader;
+import cc.wangzijie.ocr.component.TaskExecutor;
+import cc.wangzijie.ocr.task.CallbackHookTask;
+import cc.wangzijie.ocr.task.StatusHookTask;
+import cc.wangzijie.server.entity.CallbackHookVO;
 import cc.wangzijie.server.entity.OcrSection;
 import cc.wangzijie.server.entity.OcrSectionResult;
+import cc.wangzijie.server.entity.StatusHookVO;
 import cc.wangzijie.server.service.IOcrSectionResultService;
 import cc.wangzijie.server.service.IOcrSectionService;
+import cc.wangzijie.utils.JacksonUtils;
+import cc.wangzijie.utils.RetryHelper;
 import cc.wangzijie.utils.SpringHelper;
 import cc.wangzijie.ui.enums.ActionTypeEnum;
 import cc.wangzijie.ui.helper.StageManager;
@@ -35,6 +43,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
@@ -46,6 +55,10 @@ import java.util.stream.Collectors;
 @Slf4j
 @Component
 public class MainWindowView implements Initializable {
+
+    @Resource
+    private ServerConfig serverConfig;
+
 
     @Resource
     private IOcrSectionService ocrSectionService;
@@ -66,6 +79,9 @@ public class MainWindowView implements Initializable {
 
     @Resource
     private MainWindowModel mainWindowModel;
+
+    @Resource
+    private SettingsWindowModel settingsWindowModel;
 
     @Resource
     private ScreenshotAreaModel screenshotAreaModel;
@@ -111,6 +127,13 @@ public class MainWindowView implements Initializable {
 
     @FXML
     private Button toggleCollectStatusMenuButton;
+
+    @FXML
+    public ChoiceBox<String> updateStatusInput;
+
+    @FXML
+    public ImageView updateStatusButtonImage;
+
 
     @FXML
     private StackPane screenshotImageStackPane;
@@ -175,6 +198,15 @@ public class MainWindowView implements Initializable {
         withdrawMenuButtonImage.disableProperty().bind(withdrawModel.canWithdrawFlagProperty());
         toggleCollectStatusMenuButton.disableProperty().bindBidirectional(screenshotAreaModel.screenshotAreaNoImageFlagProperty());
 
+        updateStatusInput.setItems(FXCollections.observableList(Constants.MANUAL_UPDATE_STATUS_LIST));
+        updateStatusInput.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            log.info("==== 手动选择当前状态 ==== {}", newValue);
+            if (StringUtils.isNotBlank(newValue)) {
+                mainWindowModel.setManualUpdateStatus(newValue);
+            }
+        });
+
+        updateStatusButtonImage.imageProperty().bindBidirectional(mainWindowModel.manualUpdateStatusButtonImageProperty());
 
         // 绑定FXML组件与model属性 - 主界面 - 左侧截屏图片预览
         screenshotImage.imageProperty().bindBidirectional(screenshotAreaModel.screenshotImageProperty());
@@ -244,6 +276,7 @@ public class MainWindowView implements Initializable {
         mainWindowModel.setToggleCollectStatusMenuButtonImage(ImageLoader.load(Constants.RUN_BLUE_IMAGE_PATH));
         mainWindowModel.setCollectCountDownText("已停止");
         mainWindowModel.setCollectRunningFlag(false);
+        mainWindowModel.setManualUpdateStatusButtonImage(ImageLoader.load(Constants.SEND_IMAGE_PATH));
 
         // 处理model属性 - 主界面 - 左侧截屏图片预览区域
         screenshotAreaModel.setScreenshotImage(ImageLoader.load(Constants.SCREEN_CAPTURE_IMAGE_PATH));
@@ -430,6 +463,18 @@ public class MainWindowView implements Initializable {
         }
     }
 
+
+    @FXML
+    protected void onUpdateStatusButtonClick() {
+        log.info("==== onUpdateStatusButtonClick ==== 点击【手动修改状态】按钮！");
+        String newStatus = mainWindowModel.getManualUpdateStatus();
+        if (StringUtils.isBlank(newStatus)) {
+            log.error("未选择【手动更新状态】，跳过！");
+            return;
+        }
+        // 触发回调钩子
+        TaskExecutor.execute(new StatusHookTask(newStatus, this.settingsWindowModel, this.serverConfig));
+    }
 
     @FXML
     protected void onScreenshotImageMouseClicked(MouseEvent event) {

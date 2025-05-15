@@ -24,6 +24,7 @@ public class Constants {
     public static final String IMAGE_FORMAT_WITH_DOT = ".png";
 
     public static final String DEFAULT_CALLBACK_HOOK_URI = "/ocr/callback";
+    public static final String DEFAULT_UPDATE_STATUS_HOOK_URI = "/ocr/update-status";
 
     public static final String MAIN_WINDOW_TITLE = "PT.OCR v0.0.1";
     public static final String SETTINGS_WINDOW_TITLE = "设置";
@@ -33,6 +34,8 @@ public class Constants {
     public static final String DATA_LIST_TITLE = "数据信息";
 
     public static final List<String> DATA_TYPE_LIST = Arrays.asList("文本", "数字");
+
+    public static final List<String> MANUAL_UPDATE_STATUS_LIST = Arrays.asList("运行（升温）", "运行（保温）", "运行（试验中）", "待机", "停止");
 
     /*
      * Logo图片
@@ -54,6 +57,7 @@ public class Constants {
     public static final String SETTINGS_IMAGE_PATH = "/icons/menu/Settings.png";
     public static final String DRAG_IMAGE_PATH = "/icons/menu/Drag.png";
     public static final String HISTORY_DATA_IMAGE_PATH = "/icons/menu/HistoryData.png";
+    public static final String SEND_IMAGE_PATH = "/icons/menu/Send.png";
 
     /*
      * 菜单功能按钮图片 - 截屏

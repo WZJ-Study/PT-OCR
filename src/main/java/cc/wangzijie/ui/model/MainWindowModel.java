@@ -25,6 +25,8 @@ public class MainWindowModel {
     private final SimpleStringProperty collectCountDownText = new SimpleStringProperty();
     private final BooleanProperty collectRunningFlag = new SimpleBooleanProperty(false);
 
+    private final StringProperty manualUpdateStatus = new SimpleStringProperty();
+    private final ObjectProperty<Image> manualUpdateStatusButtonImage = new SimpleObjectProperty<>();
 
     public Image getMainWindowLogoImage() {
         return mainWindowLogoImage.get();
@@ -184,4 +186,27 @@ public class MainWindowModel {
     }
 
 
+    public String getManualUpdateStatus() {
+        return manualUpdateStatus.get();
+    }
+
+    public StringProperty manualUpdateStatusProperty() {
+        return manualUpdateStatus;
+    }
+
+    public void setManualUpdateStatus(String manualUpdateStatus) {
+        this.manualUpdateStatus.set(manualUpdateStatus);
+    }
+
+    public Image getManualUpdateStatusButtonImage() {
+        return manualUpdateStatusButtonImage.get();
+    }
+
+    public ObjectProperty<Image> manualUpdateStatusButtonImageProperty() {
+        return manualUpdateStatusButtonImage;
+    }
+
+    public void setManualUpdateStatusButtonImage(Image manualUpdateStatusButtonImage) {
+        this.manualUpdateStatusButtonImage.set(manualUpdateStatusButtonImage);
+    }
 }

@@ -66,6 +66,9 @@ public class SettingsWindowView implements Initializable {
     @FXML
     public CheckBox databaseEnabledInput;
 
+    @FXML
+    public TextField updateStatusHookUrlInput;
+
     private double offsetX;
     private double offsetY;
 
@@ -132,6 +135,16 @@ public class SettingsWindowView implements Initializable {
             savePropertiesFlag = true;
         }
         databaseEnabledInput.setSelected(Objects.equals(databaseEnabledFlag, Constants.TRUE));
+
+        // 设置#5.手动修改状态-回调URL
+        String updateStatusHookUrl = configManager.getProperty(ConfigKeys.KEY_UPDATE_STATUS_HOOK_URL);
+        if (StringUtils.isBlank(updateStatusHookUrl)) {
+            updateStatusHookUrl = serverConfig.buildUrl(Constants.DEFAULT_UPDATE_STATUS_HOOK_URI);
+            configManager.setProperty(ConfigKeys.KEY_UPDATE_STATUS_HOOK_URL, updateStatusHookUrl);
+            savePropertiesFlag = true;
+        }
+        updateStatusHookUrlInput.setText(updateStatusHookUrl);
+
 
         // 保存配置文件
         if (savePropertiesFlag) {
@@ -207,6 +220,12 @@ public class SettingsWindowView implements Initializable {
         settingsWindowModel.setDatabaseEnabledFlag(databaseEnabledFlag);
         configManager.setProperty(ConfigKeys.KEY_DATABASE_ENABLED_FLAG, databaseEnabledFlag ? Constants.TRUE : Constants.FALSE);
 
+        // 设置#5.手动修改状态-回调URL
+        String updateStatusHookUrl = this.processUpdateStatusHookUrlInput(updateStatusHookUrlInput.getText());
+        updateStatusHookUrlInput.setText(updateStatusHookUrl);
+        settingsWindowModel.setUpdateStatusHookUrl(updateStatusHookUrl);
+        configManager.setProperty(ConfigKeys.KEY_UPDATE_STATUS_HOOK_URL, updateStatusHookUrl);
+
         // 保存配置文件
         configManager.saveProperties();
 
@@ -280,5 +299,19 @@ public class SettingsWindowView implements Initializable {
         return serverConfig.buildUrl(Constants.DEFAULT_CALLBACK_HOOK_URI);
     }
 
-
+    private String processUpdateStatusHookUrlInput(String input) {
+        log.info("==== 处理输入值 ==== 原始输入：{}", input);
+        if (StringUtils.isNotBlank(input)) {
+            if (input.startsWith("http://") || input.startsWith("https://")) {
+                try {
+                    // This will throw an exception if the URL is malformed
+                    new URL(input);
+                    return input;
+                } catch (MalformedURLException e) {
+                    log.error("URL格式错误！>> " + input, e);
+                }
+            }
+        }
+        return serverConfig.buildUrl(Constants.DEFAULT_UPDATE_STATUS_HOOK_URI);
+    }
 }
