@@ -272,7 +272,7 @@
                     <!-- 虚拟机参数 -->
                     <vmArgs>
                         <vmArg>-Dfile.encoding=utf-8</vmArg>
-                        <vmArg>-Xmx128m</vmArg>
+                        <vmArg>-Xmx256m</vmArg>
                     </vmArgs>
 
                     <!-- 特定平台参数 -->
