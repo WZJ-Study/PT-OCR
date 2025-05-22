@@ -8,10 +8,13 @@ import cc.wangzijie.constants.Constants;
 import cc.wangzijie.ui.helper.StageManager;
 import cc.wangzijie.ui.model.SettingsWindowModel;
 import cc.wangzijie.ui.utils.ImageLoader;
+import cc.wangzijie.utils.IpHelper;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.TextField;
 import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseEvent;
@@ -24,6 +27,7 @@ import javax.annotation.Resource;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.ResourceBundle;
 
@@ -69,6 +73,12 @@ public class SettingsWindowView implements Initializable {
     @FXML
     public TextField updateStatusHookUrlInput;
 
+    @FXML
+    public ChoiceBox<String> localIpInput;
+
+    @FXML
+    public ImageView refreshIpListButtonImage;
+
     private double offsetX;
     private double offsetY;
 
@@ -79,6 +89,19 @@ public class SettingsWindowView implements Initializable {
         closeWindowButtonImage.imageProperty().bindBidirectional(settingsWindowModel.closeWindowButtonImageProperty());
         // 绑定FXML组件与model属性 - 窗口底部应用设置按钮
         applySettingButtonImage.imageProperty().bindBidirectional(settingsWindowModel.applySettingButtonImageProperty());
+
+        // 设置#6.本机IP-选择网卡
+        localIpInput.setItems(settingsWindowModel.getLocalIpList());
+        localIpInput.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            log.info("==== 本机IP-选择网卡 ==== {}", newValue);
+            if (null != newValue) {
+                configManager.setProperty(ConfigKeys.KEY_LOCAL_IP, newValue);
+                settingsWindowModel.setLocalIp(newValue);
+            }
+        });
+
+        refreshIpListButtonImage.imageProperty().bindBidirectional(settingsWindowModel.refreshIpListButtonImageProperty());
+
 
         boolean savePropertiesFlag = false;
 
@@ -146,6 +169,26 @@ public class SettingsWindowView implements Initializable {
         updateStatusHookUrlInput.setText(updateStatusHookUrl);
 
 
+
+        // 设置#6.本机IP-选择网卡
+        String localIp = configManager.getProperty(ConfigKeys.KEY_LOCAL_IP);
+        if (StringUtils.isBlank(localIp)) {
+            // 初始化配置文件
+            localIp = IpHelper.LOCAL_IP;
+            log.info("==== initialize ==== 初始化配置，默认本机IP：{}", localIp);
+            configManager.setProperty(ConfigKeys.KEY_LOCAL_IP, localIp);
+            savePropertiesFlag = true;
+        } else if (!settingsWindowModel.getLocalIpList().contains(localIp)) {
+            // 配置的本地IP当前不存在的，重新设置为默认本机IP
+            log.info("==== initialize ==== 配置的本地IP[ {} ]当前不存在，重新设置为默认本机IP：{}",
+                    localIp, IpHelper.LOCAL_IP);
+            localIp = IpHelper.LOCAL_IP;
+            configManager.setProperty(ConfigKeys.KEY_LOCAL_IP, localIp);
+            savePropertiesFlag = true;
+        }
+        // 设置默认选中
+        localIpInput.getSelectionModel().select(settingsWindowModel.getLocalIpIndex(localIp));
+
         // 保存配置文件
         if (savePropertiesFlag) {
             configManager.saveProperties();
@@ -155,6 +198,8 @@ public class SettingsWindowView implements Initializable {
         settingsWindowModel.setCloseWindowButtonImage(ImageLoader.load(Constants.CLOSE_IMAGE_PATH));
         // 处理model属性 - 窗口底部应用设置按钮
         settingsWindowModel.setApplySettingButtonImage(ImageLoader.load(Constants.APPLY_IMAGE_PATH));
+        // 处理model属性 - 刷新IP列表按钮
+        settingsWindowModel.setRefreshIpListButtonImage(ImageLoader.load(Constants.RELOAD_BLACK_IMAGE_PATH));
     }
 
 
@@ -183,6 +228,32 @@ public class SettingsWindowView implements Initializable {
         }
     }
 
+    @FXML
+    protected void onRefreshIpListButtonClick() {
+        log.info("==== onRefreshIpListButtonClick ==== 点击【刷新本机网卡IP列表】按钮！");
+        settingsWindowModel.getLocalIpList().clear();
+        settingsWindowModel.getLocalIpList().addAll(IpHelper.getServerIpList());
+
+        log.info("==== onRefreshIpListButtonClick ==== 刷新本机网卡IP列表：{}", settingsWindowModel.getLocalIpList());
+        // 设置默认选中
+        String localIp = configManager.getProperty(ConfigKeys.KEY_LOCAL_IP);
+        if (StringUtils.isBlank(localIp)) {
+            localIp = IpHelper.LOCAL_IP;
+            log.info("==== initialize ==== 初始化配置，默认本机IP：{}", localIp);
+            configManager.setProperty(ConfigKeys.KEY_LOCAL_IP, localIp);
+            configManager.saveProperties();
+        } else if (!settingsWindowModel.getLocalIpList().contains(localIp)) {
+            // 配置的本地IP当前不存在的，重新设置为默认本机IP
+            log.info("==== onRefreshIpListButtonClick ==== 配置的本地IP[ {} ]当前不存在，重新设置为默认本机IP：{}",
+                    localIp, IpHelper.LOCAL_IP);
+            localIp = IpHelper.LOCAL_IP;
+            configManager.setProperty(ConfigKeys.KEY_LOCAL_IP, localIp);
+            configManager.saveProperties();
+        }
+        // 设置默认选中
+        localIpInput.getSelectionModel().select(settingsWindowModel.getLocalIpIndex(localIp));
+        log.info("==== onRefreshIpListButtonClick ==== 默认选中的本机网卡IP：{}", localIp);
+    }
 
     @FXML
     protected void onApplySettings() {

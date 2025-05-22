@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 @ToString
 public class StatusHookVO {
 
-    public static StatusHookVO of(String status) {
+    public static StatusHookVO of(String localIp, String status) {
         StatusHookVO vo = new StatusHookVO();
-        vo.setIpAddr(IpHelper.LOCAL_IP);
+        vo.setIpAddr(localIp);
         vo.setHostName(IpHelper.HOST_NAME);
         vo.setData(status);
         vo.setSendTime(DateUtils.nowStr());

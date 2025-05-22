@@ -6,6 +6,7 @@ import cc.wangzijie.server.entity.CallbackHookVO;
 import cc.wangzijie.server.entity.OcrSectionResult;
 import cc.wangzijie.server.service.IOcrSectionResultService;
 import cc.wangzijie.ui.model.SettingsWindowModel;
+import cc.wangzijie.utils.IpHelper;
 import cc.wangzijie.utils.JacksonUtils;
 import cc.wangzijie.utils.RetryHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -23,6 +24,8 @@ import java.util.List;
 @Slf4j
 public class CallbackHookTask implements Runnable {
 
+    private final String localIp;
+
     private final List<OcrSectionResult> resultList;
 
     private final boolean enabledFlag;
@@ -32,6 +35,11 @@ public class CallbackHookTask implements Runnable {
     private final RestTemplate restTemplate;
 
     public CallbackHookTask(List<OcrSectionResult> resultList, SettingsWindowModel settingsWindowModel, ServerConfig serverConfig, RestTemplate restTemplate) {
+        if (settingsWindowModel == null || settingsWindowModel.getLocalIp() == null) {
+            this.localIp = IpHelper.LOCAL_IP;
+        } else {
+            this.localIp = settingsWindowModel.getLocalIp();
+        }
         this.resultList = resultList;
         if (settingsWindowModel == null) {
             this.enabledFlag = true;
@@ -56,7 +64,7 @@ public class CallbackHookTask implements Runnable {
             log.info("==== CallbackHookTask ==== 没有需要发送的结果数据，跳过！");
             return;
         }
-        CallbackHookVO vo = CallbackHookVO.of(resultList);
+        CallbackHookVO vo = CallbackHookVO.of(localIp, resultList);
         String jsonData = JacksonUtils.toJSONString(vo);
         log.info("==== CallbackHookTask ==== 回调钩子URL：{} \n准备发送的json数据: {}", callbackHookUrl, jsonData);
         RetryHelper.execute(context -> callback(jsonData));

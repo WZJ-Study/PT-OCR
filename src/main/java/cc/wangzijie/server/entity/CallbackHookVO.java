@@ -14,9 +14,9 @@ import java.util.stream.Collectors;
 @ToString
 public class CallbackHookVO {
 
-    public static CallbackHookVO of(List<OcrSectionResult> resultList) {
+    public static CallbackHookVO of(String localIp, List<OcrSectionResult> resultList) {
         CallbackHookVO vo = new CallbackHookVO();
-        vo.setIpAddr(IpHelper.LOCAL_IP);
+        vo.setIpAddr(localIp);
         vo.setHostName(IpHelper.HOST_NAME);
         vo.setData(resultList.stream().map(OcrSectionResult::toDisplay).collect(Collectors.toList()));
         vo.setSendTime(DateUtils.nowStr());

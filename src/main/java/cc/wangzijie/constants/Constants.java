@@ -54,6 +54,7 @@ public class Constants {
      * 菜单功能按钮图片
      */
     public static final String RELOAD_IMAGE_PATH = "/icons/menu/Reload.png";
+    public static final String RELOAD_BLACK_IMAGE_PATH = "/icons/menu/Reload_Black.png";
     public static final String SETTINGS_IMAGE_PATH = "/icons/menu/Settings.png";
     public static final String DRAG_IMAGE_PATH = "/icons/menu/Drag.png";
     public static final String HISTORY_DATA_IMAGE_PATH = "/icons/menu/HistoryData.png";

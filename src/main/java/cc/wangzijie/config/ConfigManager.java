@@ -42,9 +42,9 @@ public class ConfigManager {
         properties.setProperty(key, value);
     }
 
-    public static void main(String[] args) {
-        ConfigManager manager = new ConfigManager();
-        manager.setProperty("password", "newpassword456"); // 修改配置项
-        manager.saveProperties(); // 保存配置文件
-    }
+//    public static void main(String[] args) {
+//        ConfigManager manager = new ConfigManager();
+//        manager.setProperty("password", "newpassword456"); // 修改配置项
+//        manager.saveProperties(); // 保存配置文件
+//    }
 }

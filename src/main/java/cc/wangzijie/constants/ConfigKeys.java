@@ -13,4 +13,6 @@ public class ConfigKeys {
     public static final String KEY_DATABASE_ENABLED_FLAG = "databaseEnabledFlag";
 
     public static final String KEY_UPDATE_STATUS_HOOK_URL = "updateStatusHookUrl";
+
+    public static final String KEY_LOCAL_IP = "localIp";
 }

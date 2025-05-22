@@ -6,6 +6,7 @@ import cc.wangzijie.server.entity.CallbackHookVO;
 import cc.wangzijie.server.entity.OcrSectionResult;
 import cc.wangzijie.server.entity.StatusHookVO;
 import cc.wangzijie.ui.model.SettingsWindowModel;
+import cc.wangzijie.utils.IpHelper;
 import cc.wangzijie.utils.JacksonUtils;
 import cc.wangzijie.utils.RetryHelper;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +26,8 @@ import java.util.List;
 @Slf4j
 public class StatusHookTask implements Runnable {
 
+    private final String localIp;
+
     private final String newStatus;
 
     private final String updateStatusHookUrl;
@@ -32,6 +35,11 @@ public class StatusHookTask implements Runnable {
     private final RestTemplate restTemplate;
 
     public StatusHookTask(String newStatus, SettingsWindowModel settingsWindowModel, ServerConfig serverConfig, RestTemplate restTemplate) {
+        if (settingsWindowModel == null || settingsWindowModel.getLocalIp() == null) {
+            this.localIp = IpHelper.LOCAL_IP;
+        } else {
+            this.localIp = settingsWindowModel.getLocalIp();
+        }
         this.newStatus = newStatus;
         if (settingsWindowModel == null || settingsWindowModel.getUpdateStatusHookUrl() == null) {
             this.updateStatusHookUrl = serverConfig.buildUrl(Constants.DEFAULT_UPDATE_STATUS_HOOK_URI);
@@ -49,7 +57,7 @@ public class StatusHookTask implements Runnable {
             log.info("==== StatusHookTask ==== 没有需要发送的结果数据，跳过！");
             return;
         }
-        StatusHookVO vo = StatusHookVO.of(newStatus);
+        StatusHookVO vo = StatusHookVO.of(localIp, newStatus);
         String jsonData = JacksonUtils.toJSONString(vo);
         log.info("==== StatusHookTask ==== 回调钩子URL：{} \n准备发送的json数据: {}", this.updateStatusHookUrl, jsonData);
         RetryHelper.execute(context -> callback(jsonData));

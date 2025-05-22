@@ -1,7 +1,10 @@
 package cc.wangzijie.ui.model;
 
 import cc.wangzijie.constants.Constants;
+import cc.wangzijie.utils.IpHelper;
 import javafx.beans.property.*;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.scene.image.Image;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +26,13 @@ public class SettingsWindowModel {
     private final BooleanProperty databaseEnabledFlag = new SimpleBooleanProperty(true);
 
     private final StringProperty updateStatusHookUrl = new SimpleStringProperty();
+
+    private final StringProperty localIp = new SimpleStringProperty();
+
+    private final ObservableList<String> localIpList = FXCollections.observableArrayList(IpHelper.getServerIpList());
+
+    private final ObjectProperty<Image> refreshIpListButtonImage = new SimpleObjectProperty<>();
+
 
     public Image getCloseWindowButtonImage() {
         return closeWindowButtonImage.get();
@@ -132,4 +142,35 @@ public class SettingsWindowModel {
         this.updateStatusHookUrl.set(updateStatusHookUrl);
     }
 
+    public String getLocalIp() {
+        return localIp.get();
+    }
+
+    public StringProperty localIpProperty() {
+        return localIp;
+    }
+
+    public void setLocalIp(String localIp) {
+        this.localIp.set(localIp);
+    }
+
+    public ObservableList<String> getLocalIpList() {
+        return localIpList;
+    }
+
+    public int getLocalIpIndex(String localIp) {
+        return localIpList.indexOf(localIp);
+    }
+
+    public Image getRefreshIpListButtonImage() {
+        return refreshIpListButtonImage.get();
+    }
+
+    public ObjectProperty<Image> refreshIpListButtonImageProperty() {
+        return refreshIpListButtonImage;
+    }
+
+    public void setRefreshIpListButtonImage(Image refreshIpListButtonImage) {
+        this.refreshIpListButtonImage.set(refreshIpListButtonImage);
+    }
 }
