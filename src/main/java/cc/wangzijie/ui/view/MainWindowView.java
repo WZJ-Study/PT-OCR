@@ -45,6 +45,7 @@ import javafx.stage.Stage;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import java.net.URL;
@@ -59,6 +60,8 @@ public class MainWindowView implements Initializable {
     @Resource
     private ServerConfig serverConfig;
 
+    @Resource
+    private RestTemplate restTemplate;
 
     @Resource
     private IOcrSectionService ocrSectionService;
@@ -473,7 +476,7 @@ public class MainWindowView implements Initializable {
             return;
         }
         // 触发回调钩子
-        TaskExecutor.execute(new StatusHookTask(newStatus, this.settingsWindowModel, this.serverConfig));
+        TaskExecutor.execute(new StatusHookTask(newStatus, this.settingsWindowModel, this.serverConfig, this.restTemplate));
     }
 
     @FXML

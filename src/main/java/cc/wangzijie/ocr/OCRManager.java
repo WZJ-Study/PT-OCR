@@ -16,6 +16,7 @@ import io.github.mymonstercat.Model;
 import io.github.mymonstercat.ocr.InferenceEngine;
 import javafx.application.Platform;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.web.client.RestTemplate;
 
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -63,6 +64,11 @@ public class OCRManager {
     private final ServerConfig serverConfig;
 
     /**
+     * RestTemplate
+     */
+    private final RestTemplate restTemplate;
+
+    /**
      * RapidOCR识别引擎
      */
     private final InferenceEngine ocrEngine;
@@ -94,13 +100,14 @@ public class OCRManager {
 
     private volatile boolean running;
 
-    public OCRManager(ScreenshotAreaModel screenshotAreaModel, DataListAreaModel dataListAreaModel, MainWindowModel mainWindowModel, SettingsWindowModel settingsWindowModel, IOcrSectionResultService ocrSectionResultService, ServerConfig serverConfig) {
+    public OCRManager(ScreenshotAreaModel screenshotAreaModel, DataListAreaModel dataListAreaModel, MainWindowModel mainWindowModel, SettingsWindowModel settingsWindowModel, IOcrSectionResultService ocrSectionResultService, ServerConfig serverConfig, RestTemplate restTemplate) {
         this.screenshotAreaModel = screenshotAreaModel;
         this.dataListAreaModel = dataListAreaModel;
         this.mainWindowModel = mainWindowModel;
         this.settingsWindowModel = settingsWindowModel;
         this.ocrSectionResultService = ocrSectionResultService;
         this.serverConfig = serverConfig;
+        this.restTemplate = restTemplate == null ? new RestTemplate() : restTemplate;
         this.ocrEngine = InferenceEngine.getInstance(Model.ONNX_PPOCR_V4_SERVER);
         // 默认时间间隔：5s
         this.intervalSeconds = Constants.DEFAULT_INTERVAL_SECONDS;
@@ -214,6 +221,6 @@ public class OCRManager {
     }
 
     public CallbackHookTask createCallbackHookTask(List<OcrSectionResult> resultList) {
-        return new CallbackHookTask(resultList, this.settingsWindowModel, this.serverConfig);
+        return new CallbackHookTask(resultList, this.settingsWindowModel, this.serverConfig, this.restTemplate);
     }
 }

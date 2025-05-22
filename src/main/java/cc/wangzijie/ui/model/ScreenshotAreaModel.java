@@ -13,6 +13,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
+import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
@@ -37,6 +38,9 @@ public class ScreenshotAreaModel {
     private ServerConfig serverConfig;
 
     @Resource
+    private RestTemplate restTemplate;
+
+    @Resource
     private DataListAreaModel dataListAreaModel;
 
     @Resource
@@ -53,7 +57,7 @@ public class ScreenshotAreaModel {
 
     @PostConstruct
     public void init() {
-        this.ocrManager = new OCRManager(this, dataListAreaModel, mainWindowModel, settingsWindowModel, ocrSectionResultService, serverConfig);
+        this.ocrManager = new OCRManager(this, dataListAreaModel, mainWindowModel, settingsWindowModel, ocrSectionResultService, serverConfig, restTemplate);
         this.settingsWindowModel.intervalSecondsProperty().addListener((observableValue, oldValue, newValue) -> {
             log.info("==== 修改定时采集间隔 ==== 设置新的采集间隔：{}秒", newValue);
             this.ocrManager.setIntervalSeconds(newValue.intValue());

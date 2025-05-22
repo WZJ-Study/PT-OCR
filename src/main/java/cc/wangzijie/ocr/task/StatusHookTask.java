@@ -15,6 +15,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.RequestEntity;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.SimpleClientHttpRequestFactory;
 import org.springframework.web.client.RestTemplate;
 
 import java.net.URI;
@@ -30,15 +31,17 @@ public class StatusHookTask implements Runnable {
 
     private final RestTemplate restTemplate;
 
-    public StatusHookTask(String newStatus, SettingsWindowModel settingsWindowModel, ServerConfig serverConfig) {
+    public StatusHookTask(String newStatus, SettingsWindowModel settingsWindowModel, ServerConfig serverConfig, RestTemplate restTemplate) {
         this.newStatus = newStatus;
         if (settingsWindowModel == null || settingsWindowModel.getUpdateStatusHookUrl() == null) {
             this.updateStatusHookUrl = serverConfig.buildUrl(Constants.DEFAULT_UPDATE_STATUS_HOOK_URI);
         } else {
             this.updateStatusHookUrl = settingsWindowModel.getUpdateStatusHookUrl();
         }
-        restTemplate = new RestTemplate();
+        this.restTemplate = restTemplate == null ? new RestTemplate() : restTemplate;
     }
+
+
 
     @Override
     public void run() {

@@ -29,9 +29,9 @@ public class CallbackHookTask implements Runnable {
 
     private final String callbackHookUrl;
 
-    private RestTemplate restTemplate;
+    private final RestTemplate restTemplate;
 
-    public CallbackHookTask(List<OcrSectionResult> resultList, SettingsWindowModel settingsWindowModel, ServerConfig serverConfig) {
+    public CallbackHookTask(List<OcrSectionResult> resultList, SettingsWindowModel settingsWindowModel, ServerConfig serverConfig, RestTemplate restTemplate) {
         this.resultList = resultList;
         if (settingsWindowModel == null) {
             this.enabledFlag = true;
@@ -43,9 +43,7 @@ public class CallbackHookTask implements Runnable {
         } else {
             this.callbackHookUrl = settingsWindowModel.getCallbackHookUrl();
         }
-        if (this.enabledFlag) {
-            restTemplate = new RestTemplate();
-        }
+        this.restTemplate = restTemplate == null ? new RestTemplate() : restTemplate;
     }
 
     @Override
@@ -78,7 +76,7 @@ public class CallbackHookTask implements Runnable {
                 log.error("==== callback ==== 回调钩子URL失败！对方返回结果：{}", responseEntity.getBody());
                 throw new RuntimeException(responseEntity.getBody());
             }
-        } catch (URISyntaxException e) {
+        } catch (Exception e) {
             log.error("==== callback ==== 回调钩子URL失败！", e);
             throw new RuntimeException(e);
         }
