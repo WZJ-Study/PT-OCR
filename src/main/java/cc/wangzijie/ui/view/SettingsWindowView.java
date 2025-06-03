@@ -74,6 +74,9 @@ public class SettingsWindowView implements Initializable {
     public TextField updateStatusHookUrlInput;
 
     @FXML
+    public TextField stopWarningHookUrlInput;
+
+    @FXML
     public ChoiceBox<String> localIpInput;
 
     @FXML
@@ -169,8 +172,16 @@ public class SettingsWindowView implements Initializable {
         updateStatusHookUrlInput.setText(updateStatusHookUrl);
 
 
+        // 设置#6.关闭灯光报警-回调URL
+        String stopWarningHookUrl = configManager.getProperty(ConfigKeys.KEY_STOP_WARNING_HOOK_URL);
+        if (StringUtils.isBlank(stopWarningHookUrl)) {
+            stopWarningHookUrl = serverConfig.buildUrl(Constants.DEFAULT_STOP_WARNING_HOOK_URI);
+            configManager.setProperty(ConfigKeys.KEY_STOP_WARNING_HOOK_URL, stopWarningHookUrl);
+            savePropertiesFlag = true;
+        }
+        stopWarningHookUrlInput.setText(stopWarningHookUrl);
 
-        // 设置#6.本机IP-选择网卡
+        // 设置#7.本机IP-选择网卡
         String localIp = configManager.getProperty(ConfigKeys.KEY_LOCAL_IP);
         if (StringUtils.isBlank(localIp)) {
             // 初始化配置文件
@@ -297,6 +308,12 @@ public class SettingsWindowView implements Initializable {
         settingsWindowModel.setUpdateStatusHookUrl(updateStatusHookUrl);
         configManager.setProperty(ConfigKeys.KEY_UPDATE_STATUS_HOOK_URL, updateStatusHookUrl);
 
+        // 设置#6.关闭灯光报警-回调URL
+        String stopWarningHookUrl = this.processStopWarningHookUrlInput(stopWarningHookUrlInput.getText());
+        stopWarningHookUrlInput.setText(stopWarningHookUrl);
+        settingsWindowModel.setStopWarningHookUrl(stopWarningHookUrl);
+        configManager.setProperty(ConfigKeys.KEY_STOP_WARNING_HOOK_URL, stopWarningHookUrl);
+
         // 保存配置文件
         configManager.saveProperties();
 
@@ -384,5 +401,21 @@ public class SettingsWindowView implements Initializable {
             }
         }
         return serverConfig.buildUrl(Constants.DEFAULT_UPDATE_STATUS_HOOK_URI);
+    }
+
+    private String processStopWarningHookUrlInput(String input) {
+        log.info("==== 处理输入值 ==== 原始输入：{}", input);
+        if (StringUtils.isNotBlank(input)) {
+            if (input.startsWith("http://") || input.startsWith("https://")) {
+                try {
+                    // This will throw an exception if the URL is malformed
+                    new URL(input);
+                    return input;
+                } catch (MalformedURLException e) {
+                    log.error("URL格式错误！>> " + input, e);
+                }
+            }
+        }
+        return serverConfig.buildUrl(Constants.DEFAULT_STOP_WARNING_HOOK_URI);
     }
 }

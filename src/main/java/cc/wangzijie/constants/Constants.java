@@ -25,6 +25,7 @@ public class Constants {
 
     public static final String DEFAULT_CALLBACK_HOOK_URI = "/ocr/callback";
     public static final String DEFAULT_UPDATE_STATUS_HOOK_URI = "/ocr/update-status";
+    public static final String DEFAULT_STOP_WARNING_HOOK_URI = "/ocr/stop-warning";
 
     public static final String MAIN_WINDOW_TITLE = "PT.OCR v0.0.1";
     public static final String SETTINGS_WINDOW_TITLE = "设置";

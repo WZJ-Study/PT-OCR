@@ -27,6 +27,7 @@ public class MainWindowModel {
 
     private final StringProperty manualUpdateStatus = new SimpleStringProperty();
     private final ObjectProperty<Image> manualUpdateStatusButtonImage = new SimpleObjectProperty<>();
+    private final ObjectProperty<Image> stopWarningButtonImage = new SimpleObjectProperty<>();
 
     public Image getMainWindowLogoImage() {
         return mainWindowLogoImage.get();
@@ -208,5 +209,17 @@ public class MainWindowModel {
 
     public void setManualUpdateStatusButtonImage(Image manualUpdateStatusButtonImage) {
         this.manualUpdateStatusButtonImage.set(manualUpdateStatusButtonImage);
+    }
+
+    public Image getStopWarningButtonImage() {
+        return stopWarningButtonImage.get();
+    }
+
+    public ObjectProperty<Image> stopWarningButtonImageProperty() {
+        return stopWarningButtonImage;
+    }
+
+    public void setStopWarningButtonImage(Image stopWarningButtonImage) {
+        this.stopWarningButtonImage.set(stopWarningButtonImage);
     }
 }

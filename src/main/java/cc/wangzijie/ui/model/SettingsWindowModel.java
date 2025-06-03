@@ -33,6 +33,8 @@ public class SettingsWindowModel {
 
     private final ObjectProperty<Image> refreshIpListButtonImage = new SimpleObjectProperty<>();
 
+    private final StringProperty stopWarningHookUrl = new SimpleStringProperty();
+
 
     public Image getCloseWindowButtonImage() {
         return closeWindowButtonImage.get();
@@ -172,5 +174,17 @@ public class SettingsWindowModel {
 
     public void setRefreshIpListButtonImage(Image refreshIpListButtonImage) {
         this.refreshIpListButtonImage.set(refreshIpListButtonImage);
+    }
+
+    public String getStopWarningHookUrl() {
+        return stopWarningHookUrl.get();
+    }
+
+    public StringProperty stopWarningHookUrlProperty() {
+        return stopWarningHookUrl;
+    }
+
+    public void setStopWarningHookUrl(String stopWarningHookUrl) {
+        this.stopWarningHookUrl.set(stopWarningHookUrl);
     }
 }

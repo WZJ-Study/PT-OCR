@@ -42,4 +42,10 @@ public class DataController {
         return jsonData;
     }
 
+    @PostMapping("/stop-warning")
+    public String stopWarning(@RequestBody(required = false) String jsonData) {
+        log.info("==== stopWarning ==== 触发【关闭灯光报警】回调！ 接收到JSON数据： {}", jsonData);
+        return jsonData == null ? "OK" : jsonData;
+    }
+
 }

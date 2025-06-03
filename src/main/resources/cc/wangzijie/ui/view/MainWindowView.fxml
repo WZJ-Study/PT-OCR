@@ -109,6 +109,16 @@
             <right>
                 <HBox alignment="CENTER_RIGHT" maxHeight="50.0" minHeight="50.0" prefHeight="50.0" spacing="10.0" BorderPane.alignment="CENTER_RIGHT">
                     <children>
+                        <Label minHeight="32.0" text="关闭报警灯光：" textFill="WHITE">
+                            <font>
+                                <Font name="Microsoft YaHei UI" size="18.0" />
+                            </font>
+                        </Label>
+                        <Button maxHeight="32.0" maxWidth="32.0" minHeight="32.0" minWidth="32.0" onAction="#onStopWarningButtonClick" prefHeight="32.0" prefWidth="32.0" styleClass="windowButton">
+                            <graphic>
+                                <ImageView fx:id="stopWarningButtonImage" fitHeight="24.0" fitWidth="24.0" pickOnBounds="true" preserveRatio="true" />
+                            </graphic>
+                        </Button>
                         <Label minHeight="32.0" text="手动修改状态：" textFill="WHITE">
                             <font>
                                 <Font name="Microsoft YaHei UI" size="18.0" />

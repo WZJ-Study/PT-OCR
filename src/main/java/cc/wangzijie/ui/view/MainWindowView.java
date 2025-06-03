@@ -6,16 +6,12 @@ import cc.wangzijie.constants.Constants;
 import cc.wangzijie.fxml.FxmlViews;
 import cc.wangzijie.fxml.loader.SpringFxmlLoader;
 import cc.wangzijie.ocr.component.TaskExecutor;
-import cc.wangzijie.ocr.task.CallbackHookTask;
+import cc.wangzijie.ocr.task.StopWarningHookTask;
 import cc.wangzijie.ocr.task.StatusHookTask;
-import cc.wangzijie.server.entity.CallbackHookVO;
 import cc.wangzijie.server.entity.OcrSection;
 import cc.wangzijie.server.entity.OcrSectionResult;
-import cc.wangzijie.server.entity.StatusHookVO;
 import cc.wangzijie.server.service.IOcrSectionResultService;
 import cc.wangzijie.server.service.IOcrSectionService;
-import cc.wangzijie.utils.JacksonUtils;
-import cc.wangzijie.utils.RetryHelper;
 import cc.wangzijie.utils.SpringHelper;
 import cc.wangzijie.ui.enums.ActionTypeEnum;
 import cc.wangzijie.ui.helper.StageManager;
@@ -137,6 +133,8 @@ public class MainWindowView implements Initializable {
     @FXML
     public ImageView updateStatusButtonImage;
 
+    @FXML
+    public ImageView stopWarningButtonImage;
 
     @FXML
     private StackPane screenshotImageStackPane;
@@ -210,6 +208,7 @@ public class MainWindowView implements Initializable {
         });
 
         updateStatusButtonImage.imageProperty().bindBidirectional(mainWindowModel.manualUpdateStatusButtonImageProperty());
+        stopWarningButtonImage.imageProperty().bindBidirectional(mainWindowModel.stopWarningButtonImageProperty());
 
         // 绑定FXML组件与model属性 - 主界面 - 左侧截屏图片预览
         screenshotImage.imageProperty().bindBidirectional(screenshotAreaModel.screenshotImageProperty());
@@ -280,6 +279,7 @@ public class MainWindowView implements Initializable {
         mainWindowModel.setCollectCountDownText("已停止");
         mainWindowModel.setCollectRunningFlag(false);
         mainWindowModel.setManualUpdateStatusButtonImage(ImageLoader.load(Constants.SEND_IMAGE_PATH));
+        mainWindowModel.setStopWarningButtonImage(ImageLoader.load(Constants.STOP_BLUE_IMAGE_PATH));
 
         // 处理model属性 - 主界面 - 左侧截屏图片预览区域
         screenshotAreaModel.setScreenshotImage(ImageLoader.load(Constants.SCREEN_CAPTURE_IMAGE_PATH));
@@ -478,6 +478,14 @@ public class MainWindowView implements Initializable {
         // 触发回调钩子
         TaskExecutor.execute(new StatusHookTask(newStatus, this.settingsWindowModel, this.serverConfig, this.restTemplate));
     }
+
+    @FXML
+    protected void onStopWarningButtonClick() {
+        log.info("==== onStopWarningButtonClick ==== 点击【关闭灯光报警】按钮！");
+        // 触发回调钩子
+        TaskExecutor.execute(new StopWarningHookTask(this.settingsWindowModel, this.serverConfig, this.restTemplate));
+    }
+
 
     @FXML
     protected void onScreenshotImageMouseClicked(MouseEvent event) {
