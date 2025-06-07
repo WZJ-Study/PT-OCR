@@ -17,4 +17,6 @@ public class ConfigKeys {
     public static final String KEY_STOP_WARNING_HOOK_URL = "stopWarningHookUrl";
 
     public static final String KEY_LOCAL_IP = "localIp";
+
+    public static final String KEY_FIELD_NAME_OPTIONS = "fieldNameOptions";
 }

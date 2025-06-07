@@ -82,6 +82,10 @@ public class SettingsWindowView implements Initializable {
     @FXML
     public ImageView refreshIpListButtonImage;
 
+
+    @FXML
+    public TextField fieldNameOptionsInput;
+
     private double offsetX;
     private double offsetY;
 
@@ -116,6 +120,8 @@ public class SettingsWindowView implements Initializable {
             savePropertiesFlag = true;
         }
         intervalSecondsInput.setText(intervalSeconds);
+        settingsWindowModel.setIntervalSeconds(Integer.parseInt(intervalSeconds));
+        log.info("==== 初始化【设置】窗口 ==== 定时采集间隔（秒）：{}", intervalSeconds);
 
         // 设置#2.输出文件夹路径
         String outputFolderPath = configManager.getProperty(ConfigKeys.KEY_OUTPUT_FOLDER_PATH);
@@ -125,6 +131,8 @@ public class SettingsWindowView implements Initializable {
             savePropertiesFlag = true;
         }
         outputFolderPathInput.setText(outputFolderPath);
+        settingsWindowModel.setOutputFolderPath(outputFolderPath);
+        log.info("==== 初始化【设置】窗口 ==== 输出文件夹路径：{}", outputFolderPath);
 
         // 设置#2.输出文件夹路径 - 是否启用
         String outputFolderEnabledFlag = configManager.getProperty(ConfigKeys.KEY_OUTPUT_FOLDER_ENABLED_FLAG);
@@ -134,6 +142,8 @@ public class SettingsWindowView implements Initializable {
             savePropertiesFlag = true;
         }
         outputFolderEnabledInput.setSelected(Objects.equals(outputFolderEnabledFlag, Constants.TRUE));
+        settingsWindowModel.setOutputFolderEnabledFlag(Objects.equals(outputFolderEnabledFlag, Constants.TRUE));
+        log.info("==== 初始化【设置】窗口 ==== 输出文件夹路径 - 是否启用：{}", outputFolderEnabledFlag);
 
         // 设置#3.Hook回调URL
         String callbackHookUrl = configManager.getProperty(ConfigKeys.KEY_CALLBACK_HOOK_URL);
@@ -143,6 +153,8 @@ public class SettingsWindowView implements Initializable {
             savePropertiesFlag = true;
         }
         callbackHookUrlInput.setText(callbackHookUrl);
+        settingsWindowModel.setCallbackHookUrl(callbackHookUrl);
+        log.info("==== 初始化【设置】窗口 ==== Hook回调URL：{}", callbackHookUrl);
 
         // 设置#3.Hook回调URL - 是否启用
         String callbackHookEnabledFlag = configManager.getProperty(ConfigKeys.KEY_CALLBACK_HOOK_ENABLED_FLAG);
@@ -152,6 +164,8 @@ public class SettingsWindowView implements Initializable {
             savePropertiesFlag = true;
         }
         callbackHookEnabledInput.setSelected(Objects.equals(callbackHookEnabledFlag, Constants.TRUE));
+        settingsWindowModel.setCallbackHookEnabledFlag(Objects.equals(callbackHookEnabledFlag, Constants.TRUE));
+        log.info("==== 初始化【设置】窗口 ==== Hook回调URL - 是否启用：{}", callbackHookEnabledFlag);
 
         // 设置#4.输出到本地SQLite数据库 - 是否启用
         String databaseEnabledFlag = configManager.getProperty(ConfigKeys.KEY_DATABASE_ENABLED_FLAG);
@@ -161,6 +175,8 @@ public class SettingsWindowView implements Initializable {
             savePropertiesFlag = true;
         }
         databaseEnabledInput.setSelected(Objects.equals(databaseEnabledFlag, Constants.TRUE));
+        settingsWindowModel.setDatabaseEnabledFlag(Objects.equals(databaseEnabledFlag, Constants.TRUE));
+        log.info("==== 初始化【设置】窗口 ==== 输出到本地SQLite数据库 - 是否启用：{}", databaseEnabledFlag);
 
         // 设置#5.手动修改状态-回调URL
         String updateStatusHookUrl = configManager.getProperty(ConfigKeys.KEY_UPDATE_STATUS_HOOK_URL);
@@ -170,7 +186,8 @@ public class SettingsWindowView implements Initializable {
             savePropertiesFlag = true;
         }
         updateStatusHookUrlInput.setText(updateStatusHookUrl);
-
+        settingsWindowModel.setUpdateStatusHookUrl(updateStatusHookUrl);
+        log.info("==== 初始化【设置】窗口 ==== 手动修改状态-回调URL：{}", updateStatusHookUrl);
 
         // 设置#6.关闭灯光报警-回调URL
         String stopWarningHookUrl = configManager.getProperty(ConfigKeys.KEY_STOP_WARNING_HOOK_URL);
@@ -180,18 +197,19 @@ public class SettingsWindowView implements Initializable {
             savePropertiesFlag = true;
         }
         stopWarningHookUrlInput.setText(stopWarningHookUrl);
+        settingsWindowModel.setStopWarningHookUrl(stopWarningHookUrl);
+        log.info("==== 初始化【设置】窗口 ==== 关闭灯光报警-回调URL：{}", stopWarningHookUrl);
 
         // 设置#7.本机IP-选择网卡
         String localIp = configManager.getProperty(ConfigKeys.KEY_LOCAL_IP);
         if (StringUtils.isBlank(localIp)) {
             // 初始化配置文件
             localIp = IpHelper.LOCAL_IP;
-            log.info("==== initialize ==== 初始化配置，默认本机IP：{}", localIp);
             configManager.setProperty(ConfigKeys.KEY_LOCAL_IP, localIp);
             savePropertiesFlag = true;
         } else if (!settingsWindowModel.getLocalIpList().contains(localIp)) {
             // 配置的本地IP当前不存在的，重新设置为默认本机IP
-            log.info("==== initialize ==== 配置的本地IP[ {} ]当前不存在，重新设置为默认本机IP：{}",
+            log.info("==== 初始化【设置】窗口 ==== 配置的本地IP[ {} ]当前不存在，重新设置为默认本机IP：{}",
                     localIp, IpHelper.LOCAL_IP);
             localIp = IpHelper.LOCAL_IP;
             configManager.setProperty(ConfigKeys.KEY_LOCAL_IP, localIp);
@@ -199,6 +217,19 @@ public class SettingsWindowView implements Initializable {
         }
         // 设置默认选中
         localIpInput.getSelectionModel().select(settingsWindowModel.getLocalIpIndex(localIp));
+        settingsWindowModel.setLocalIp(localIp);
+        log.info("==== 初始化【设置】窗口 ==== 本机IP：{}", localIp);
+
+        // 设置#8.数据信息字段名称-下拉候选项
+        String fieldNameOptions = configManager.getProperty(ConfigKeys.KEY_FIELD_NAME_OPTIONS);
+        if (StringUtils.isBlank(fieldNameOptions)) {
+            fieldNameOptions = Constants.DEFAULT_FIELD_NAME_OPTIONS;
+            configManager.setProperty(ConfigKeys.KEY_FIELD_NAME_OPTIONS, fieldNameOptions);
+            savePropertiesFlag = true;
+        }
+        fieldNameOptionsInput.setText(fieldNameOptions);
+        settingsWindowModel.setFieldNameOptions(fieldNameOptions);
+        log.info("==== 初始化【设置】窗口 ==== 数据信息字段名称-下拉候选项：{}", fieldNameOptions);
 
         // 保存配置文件
         if (savePropertiesFlag) {
@@ -274,45 +305,65 @@ public class SettingsWindowView implements Initializable {
         intervalSecondsInput.setText(intervalSecondsText);
         settingsWindowModel.setIntervalSeconds(intervalSeconds);
         configManager.setProperty(ConfigKeys.KEY_INTERVAL_SECONDS, intervalSecondsText);
+        log.info("==== 应用设置 ==== 定时采集间隔（秒）：{}", intervalSeconds);
 
         // 设置#2.输出文件夹路径
         String outputFolderPath = this.processOutputFolderPathInput(outputFolderPathInput.getText());
         outputFolderPathInput.setText(outputFolderPath);
         settingsWindowModel.setOutputFolderPath(outputFolderPath);
         configManager.setProperty(ConfigKeys.KEY_OUTPUT_FOLDER_PATH, outputFolderPath);
+        log.info("==== 应用设置 ==== 输出文件夹路径：{}", outputFolderPath);
 
         // 设置#2.输出文件夹路径 - 是否启用
         boolean outputFolderEnabledFlag = outputFolderEnabledInput.isSelected();
         settingsWindowModel.setOutputFolderEnabledFlag(outputFolderEnabledFlag);
         configManager.setProperty(ConfigKeys.KEY_OUTPUT_FOLDER_ENABLED_FLAG, outputFolderEnabledFlag ? Constants.TRUE : Constants.FALSE);
+        log.info("==== 应用设置 ==== 输出文件夹路径 - 是否启用：{}", outputFolderEnabledFlag);
 
         // 设置#3.Hook回调URL
         String callbackHookUrl = this.processCallbackHookUrlInput(callbackHookUrlInput.getText());
         callbackHookUrlInput.setText(callbackHookUrl);
         settingsWindowModel.setCallbackHookUrl(callbackHookUrl);
         configManager.setProperty(ConfigKeys.KEY_CALLBACK_HOOK_URL, callbackHookUrl);
+        log.info("==== 应用设置 ==== Hook回调URL：{}", callbackHookUrl);
 
         // 设置#3.Hook回调URL - 是否启用
         boolean callbackHookEnabledFlag = callbackHookEnabledInput.isSelected();
         settingsWindowModel.setCallbackHookEnabledFlag(callbackHookEnabledFlag);
         configManager.setProperty(ConfigKeys.KEY_CALLBACK_HOOK_ENABLED_FLAG, callbackHookEnabledFlag ? Constants.TRUE : Constants.FALSE);
+        log.info("==== 应用设置 ==== Hook回调URL - 是否启用：{}", callbackHookEnabledFlag);
 
         // 设置#4.输出到本地SQLite数据库 - 是否启用
         boolean databaseEnabledFlag = databaseEnabledInput.isSelected();
         settingsWindowModel.setDatabaseEnabledFlag(databaseEnabledFlag);
         configManager.setProperty(ConfigKeys.KEY_DATABASE_ENABLED_FLAG, databaseEnabledFlag ? Constants.TRUE : Constants.FALSE);
+        log.info("==== 应用设置 ==== 输出到本地SQLite数据库 - 是否启用：{}", databaseEnabledFlag);
 
         // 设置#5.手动修改状态-回调URL
         String updateStatusHookUrl = this.processUpdateStatusHookUrlInput(updateStatusHookUrlInput.getText());
         updateStatusHookUrlInput.setText(updateStatusHookUrl);
         settingsWindowModel.setUpdateStatusHookUrl(updateStatusHookUrl);
         configManager.setProperty(ConfigKeys.KEY_UPDATE_STATUS_HOOK_URL, updateStatusHookUrl);
+        log.info("==== 应用设置 ==== 手动修改状态-回调URL：{}", updateStatusHookUrl);
 
         // 设置#6.关闭灯光报警-回调URL
         String stopWarningHookUrl = this.processStopWarningHookUrlInput(stopWarningHookUrlInput.getText());
         stopWarningHookUrlInput.setText(stopWarningHookUrl);
         settingsWindowModel.setStopWarningHookUrl(stopWarningHookUrl);
         configManager.setProperty(ConfigKeys.KEY_STOP_WARNING_HOOK_URL, stopWarningHookUrl);
+        log.info("==== 应用设置 ==== 关闭灯光报警-回调URL：{}", stopWarningHookUrl);
+
+        // 设置#7.本机IP
+        String localIp = localIpInput.getSelectionModel().getSelectedItem();
+        settingsWindowModel.setLocalIp(localIp);
+        configManager.setProperty(ConfigKeys.KEY_LOCAL_IP, localIp);
+        log.info("==== 应用设置 ==== 本机IP：{}", localIp);
+
+        // 设置#8.数据信息字段名称-下拉候选项
+        String fieldNameOptions = fieldNameOptionsInput.getText();
+        settingsWindowModel.setFieldNameOptions(fieldNameOptions);
+        configManager.setProperty(ConfigKeys.KEY_FIELD_NAME_OPTIONS, fieldNameOptions);
+        log.info("==== 应用设置 ==== 数据信息字段名称-下拉候选项：{}", fieldNameOptions);
 
         // 保存配置文件
         configManager.saveProperties();

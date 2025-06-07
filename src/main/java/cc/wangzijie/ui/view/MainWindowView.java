@@ -1,7 +1,9 @@
 package cc.wangzijie.ui.view;
 
 
+import cc.wangzijie.config.ConfigManager;
 import cc.wangzijie.config.ServerConfig;
+import cc.wangzijie.constants.ConfigKeys;
 import cc.wangzijie.constants.Constants;
 import cc.wangzijie.fxml.FxmlViews;
 import cc.wangzijie.fxml.loader.SpringFxmlLoader;
@@ -12,6 +14,7 @@ import cc.wangzijie.server.entity.OcrSection;
 import cc.wangzijie.server.entity.OcrSectionResult;
 import cc.wangzijie.server.service.IOcrSectionResultService;
 import cc.wangzijie.server.service.IOcrSectionService;
+import cc.wangzijie.utils.IpHelper;
 import cc.wangzijie.utils.SpringHelper;
 import cc.wangzijie.ui.enums.ActionTypeEnum;
 import cc.wangzijie.ui.helper.StageManager;
@@ -45,6 +48,7 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.annotation.Resource;
 import java.net.URL;
+import java.util.Objects;
 import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -55,6 +59,9 @@ public class MainWindowView implements Initializable {
 
     @Resource
     private ServerConfig serverConfig;
+
+    @Resource
+    private ConfigManager configManager;
 
     @Resource
     private RestTemplate restTemplate;
@@ -178,6 +185,9 @@ public class MainWindowView implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
+        // 初始化设置Model
+        settingsWindowModel.init(configManager, serverConfig);
+
         // 绑定FXML组件与model属性 - 标题栏logo
         mainWindowLogoImage.imageProperty().bindBidirectional(mainWindowModel.mainWindowLogoImageProperty());
 
@@ -238,9 +248,17 @@ public class MainWindowView implements Initializable {
             property.addListener((observable, oldValue, newValue) -> r.setCheckedFlag(newValue));
             return property;
         }));
-        varName.setCellFactory(tableColumn -> new CustomTextFieldTableCell());
+//        varName.setCellFactory(tableColumn -> new CustomTextFieldTableCell());
+        varName.setCellFactory(tableColumn -> new CustomComboBoxTableCell(settingsWindowModel.getFieldNameOptionList()));
         varType.setCellFactory(tableColumn -> new CustomComboBoxTableCell(Constants.DATA_TYPE_LIST));
 
+//        varName.setOnEditCommit(
+//                event -> {
+//                    int row = event.getTablePosition().getRow();
+//                    OcrSectionResult r = event.getTableView().getItems().get(row);
+//                    r.setName(event.getNewValue());
+//                    onSectionEdit(r);
+//                });
         varName.setOnEditCommit(
                 event -> {
                     int row = event.getTablePosition().getRow();
@@ -294,7 +312,6 @@ public class MainWindowView implements Initializable {
         dataListAreaModel.setDataListTitleBarSearchButtonImage(ImageLoader.load(Constants.SEARCH_IMAGE_PATH));
         dataListAreaModel.setDataListTitleBarDeleteButtonImage(ImageLoader.load(Constants.DELETE_IMAGE_PATH));
     }
-
 
     private void onSectionEdit(OcrSectionResult result) {
         this.screenshotAreaModel.getOcrManager().onSectionEdit(result.getPosition(), result.getName(), result.getType());

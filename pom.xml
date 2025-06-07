@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cc.wangzijie</groupId>
     <artifactId>PT-OCR</artifactId>
-    <version>0.0.4</version>
+    <version>0.0.5</version>
     <name>PT-OCR</name>
     <description>PT-OCR</description>
     <properties>
@@ -272,7 +272,7 @@
                     <!-- 虚拟机参数 -->
                     <vmArgs>
                         <vmArg>-Dfile.encoding=utf-8</vmArg>
-                        <vmArg>-Xmx256m</vmArg>
+<!--                        <vmArg>-Xmx256m</vmArg>-->
                     </vmArgs>
 
                     <!-- 特定平台参数 -->

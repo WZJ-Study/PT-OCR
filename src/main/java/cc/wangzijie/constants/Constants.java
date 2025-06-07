@@ -8,6 +8,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Constants {
+    public static final String MAIN_WINDOW_TITLE = "PT.OCR";
+    public static final String SETTINGS_WINDOW_TITLE = "设置";
+    public static final String HISTORY_DATA_WINDOW_TITLE = "历史数据";
 
     public static final String TRUE = "true";
     public static final String FALSE = "false";
@@ -27,12 +30,11 @@ public class Constants {
     public static final String DEFAULT_UPDATE_STATUS_HOOK_URI = "/ocr/update-status";
     public static final String DEFAULT_STOP_WARNING_HOOK_URI = "/ocr/stop-warning";
 
-    public static final String MAIN_WINDOW_TITLE = "PT.OCR v0.0.1";
-    public static final String SETTINGS_WINDOW_TITLE = "设置";
-    public static final String HISTORY_DATA_WINDOW_TITLE = "历史数据";
-
     public static final String SCREENSHOT_IMAGE_HINT = "点击【截取】按钮，即可截取屏幕";
     public static final String DATA_LIST_TITLE = "数据信息";
+
+
+    public static final String DEFAULT_FIELD_NAME_OPTIONS = "字段#1,字段#2,字段#3,字段#4,字段#5,字段#6,字段#7,字段#8,字段#9,字段#10";
 
     public static final List<String> DATA_TYPE_LIST = Arrays.asList("文本", "数字");
 
