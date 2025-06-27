@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>cc.wangzijie</groupId>
     <artifactId>PT-OCR</artifactId>
-    <version>0.0.6</version>
+    <version>0.0.7</version>
     <name>PT-OCR</name>
     <description>PT-OCR</description>
     <properties>
