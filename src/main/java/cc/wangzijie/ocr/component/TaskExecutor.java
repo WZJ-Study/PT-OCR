@@ -2,9 +2,11 @@ package cc.wangzijie.ocr.component;
 
 
 import cc.wangzijie.ocr.task.OcrProcessTask;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.concurrent.*;
 
+@Slf4j
 public class TaskExecutor {
 
     private static final int CORE_POOL_SIZE = Runtime.getRuntime().availableProcessors();
@@ -22,11 +24,14 @@ public class TaskExecutor {
     static {
         // 清理代码，例如关闭数据库连接、停止线程等
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
+            log.info("==== Runtime ShutdownHook Triggered! ==== 清理代码，例如关闭数据库连接、停止线程等");
             if (!SCHEDULED_EXECUTOR_SERVICE.isShutdown()) {
                 SCHEDULED_EXECUTOR_SERVICE.shutdown();
+                log.info("==== Runtime ShutdownHook Triggered! ==== 关闭定时任务执行的线程池：SCHEDULED_EXECUTOR_SERVICE");
             }
             if (!EXECUTOR_SERVICE.isShutdown()) {
                 EXECUTOR_SERVICE.shutdown();
+                log.info("==== Runtime ShutdownHook Triggered! ==== 关闭线程池：EXECUTOR_SERVICE");
             }
         }));
     }

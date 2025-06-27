@@ -124,11 +124,16 @@ public class OCRManager {
         if (this.running) {
             return;
         }
+        log.info("==== OCRManager ==== 开始运行！");
+        boolean syncFlag = true;
+
         // 开始定时截屏采集
-        SnapshotTask snapshotTask = new SnapshotTask(this.screenshotAreaModel, this, this.screenshotAreaModel.getScreenshotArea());
+        log.info("==== OCRManager ==== 创建截屏采集定时任务 SnapshotTask 定时采集截屏图片（时间间隔：{}秒）", intervalSeconds);
+        SnapshotTask snapshotTask = new SnapshotTask(this.screenshotAreaModel, this, this.screenshotAreaModel.getScreenshotArea(), syncFlag);
         this.scheduledFuture = TaskExecutor.scheduleWithFixedDelay(snapshotTask, intervalSeconds, intervalSeconds, TimeUnit.SECONDS);
 
         // 开始倒计时
+        log.info("==== OCRManager ==== 创建屏幕倒计时定时任务 scheduleAtFixedRate 每秒一次刷新屏幕倒计时");
         this.countDownSeconds.set(this.intervalSeconds);
         this.countDownFuture = TaskExecutor.scheduleAtFixedRate(() -> {
             int cdSec = this.countDownSeconds.getAndDecrement();
@@ -141,6 +146,7 @@ public class OCRManager {
         }, 0, 1, TimeUnit.SECONDS);
 
         // 设置运行标志=运行中
+        log.info("==== OCRManager ==== 设置运行标志=运行中");
         this.running = true;
     }
 
@@ -148,21 +154,26 @@ public class OCRManager {
      * 结束运行
      */
     public synchronized void stop() {
-        // 停止截屏定时任务
+        log.info("==== OCRManager ==== 结束运行！");
+        // 停止截屏采集定时任务
         if (null != this.scheduledFuture) {
             if (!this.scheduledFuture.isCancelled() || !this.scheduledFuture.isDone()) {
                 this.scheduledFuture.cancel(true);
+                log.info("==== OCRManager ==== 停止截屏采集定时任务！");
             }
         }
         // 结束倒计时
         if (null != this.countDownFuture) {
             if (!this.countDownFuture.isCancelled() || !this.countDownFuture.isDone()) {
                 this.countDownFuture.cancel(true);
+                log.info("==== OCRManager ==== 停止屏幕倒计时定时任务！");
             }
         }
         // 设置运行标志=已停止
+        log.info("==== OCRManager ==== 设置运行标志=已停止");
         this.running = false;
         // 确保UI更新在JavaFX线程中执行
+        log.info("==== OCRManager ==== UI显示文本：已停止");
         Platform.runLater(() -> {
             mainWindowModel.setCollectCountDownText("已停止");
         });
@@ -208,19 +219,24 @@ public class OCRManager {
         this.dataListAreaModel.addData(key, result);
     }
 
-    public OcrProcessTask createTask(BufferedImage screenshot) {
-        return new OcrProcessTask(this, this.ocrEngine, screenshot, this.ocrSectionMap);
+    public OcrProcessTask createOcrProcessTask(String triggerLabel, BufferedImage screenshot, boolean syncFlag) {
+        log.info("==== OCRManager ==== 创建OCR处理任务 OcrProcessTask[{}] 处理截屏图片", triggerLabel);
+        return new OcrProcessTask(triggerLabel, this, this.ocrEngine, screenshot, this.ocrSectionMap, syncFlag);
     }
 
-    public FileOutputTask createFileOutputTask(BufferedImage screenshot, List<OcrSectionResult> resultList) {
-        return new FileOutputTask(screenshot, this.ocrSectionMap, resultList, this.settingsWindowModel);
+    public FileOutputTask createFileOutputTask(String triggerLabel, BufferedImage screenshot, List<OcrSectionResult> resultList) {
+        log.info("==== OCRManager ==== 创建文件输出任务 FileOutputTask[{}] 保存截屏图片和OCR识别结果", triggerLabel);
+        return new FileOutputTask(triggerLabel, screenshot, this.ocrSectionMap, resultList, this.settingsWindowModel);
     }
 
-    public DatabaseOutputTask createDatabaseOutputTask(List<OcrSectionResult> resultList) {
-        return new DatabaseOutputTask(this.ocrSectionResultService, resultList, this.settingsWindowModel);
+    public DatabaseOutputTask createDatabaseOutputTask(String triggerLabel, List<OcrSectionResult> resultList) {
+        log.info("==== OCRManager ==== 创建数据库输出任务 DatabaseOutputTask[{}] 保存OCR识别结果", triggerLabel);
+        return new DatabaseOutputTask(triggerLabel, this.ocrSectionResultService, resultList, this.settingsWindowModel);
     }
 
-    public CallbackHookTask createCallbackHookTask(List<OcrSectionResult> resultList) {
-        return new CallbackHookTask(resultList, this.settingsWindowModel, this.serverConfig, this.restTemplate);
+    public CallbackHookTask createCallbackHookTask(String triggerLabel, List<OcrSectionResult> resultList) {
+        log.info("==== OCRManager ==== 创建URL回调任务 CallbackHookTask[{}] 发送OCR识别结果", triggerLabel);
+        return new CallbackHookTask(triggerLabel, resultList, this.settingsWindowModel, this.serverConfig, this.restTemplate);
     }
+
 }

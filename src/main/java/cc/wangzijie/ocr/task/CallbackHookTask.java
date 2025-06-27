@@ -34,7 +34,11 @@ public class CallbackHookTask implements Runnable {
 
     private final RestTemplate restTemplate;
 
-    public CallbackHookTask(List<OcrSectionResult> resultList, SettingsWindowModel settingsWindowModel, ServerConfig serverConfig, RestTemplate restTemplate) {
+    private final String triggerLabel;
+
+    public CallbackHookTask(String triggerLabel, List<OcrSectionResult> resultList, SettingsWindowModel settingsWindowModel, ServerConfig serverConfig, RestTemplate restTemplate) {
+        log.info("==== CallbackHookTask[{}] ==== URL回调任务初始化：开始！", triggerLabel);
+        this.triggerLabel = triggerLabel;
         if (settingsWindowModel == null || settingsWindowModel.getLocalIp() == null) {
             this.localIp = IpHelper.LOCAL_IP;
         } else {
@@ -52,21 +56,22 @@ public class CallbackHookTask implements Runnable {
             this.callbackHookUrl = settingsWindowModel.getCallbackHookUrl();
         }
         this.restTemplate = restTemplate == null ? new RestTemplate() : restTemplate;
+        log.info("==== CallbackHookTask[{}] ==== URL回调任务初始化：完毕！", triggerLabel);
     }
 
     @Override
     public void run() {
         if (!this.enabledFlag) {
-            log.info("==== CallbackHookTask ==== 已禁用回调钩子URL，跳过！");
+            log.info("==== CallbackHookTask[{}] ==== 已禁用回调钩子URL，跳过！", triggerLabel);
             return;
         }
         if (CollectionUtils.isEmpty(resultList)) {
-            log.info("==== CallbackHookTask ==== 没有需要发送的结果数据，跳过！");
+            log.info("==== CallbackHookTask[{}] ==== 没有需要发送的结果数据，跳过！", triggerLabel);
             return;
         }
         CallbackHookVO vo = CallbackHookVO.of(localIp, resultList);
         String jsonData = JacksonUtils.toJSONString(vo);
-        log.info("==== CallbackHookTask ==== 回调钩子URL：{} \n准备发送的json数据: {}", callbackHookUrl, jsonData);
+        log.info("==== CallbackHookTask[{}] ==== 回调钩子URL：{} \n准备发送的json数据: {}", triggerLabel, callbackHookUrl, jsonData);
         RetryHelper.execute(context -> callback(jsonData));
     }
 
@@ -78,14 +83,14 @@ public class CallbackHookTask implements Runnable {
                     .contentType(MediaType.APPLICATION_JSON).body(jsonData);
             ResponseEntity<String> responseEntity = restTemplate.exchange(requestEntity, String.class);
             if (responseEntity.getStatusCode().is2xxSuccessful()) {
-                log.info("==== callback ==== 回调钩子URL成功！对方返回结果：{}", responseEntity.getBody());
+                log.info("==== CallbackHookTask[{}] callback ==== 回调钩子URL成功！对方返回结果：{}", triggerLabel, responseEntity.getBody());
                 return true;
             } else {
-                log.error("==== callback ==== 回调钩子URL失败！对方返回结果：{}", responseEntity.getBody());
+                log.error("==== CallbackHookTask[{}] callback ==== 回调钩子URL失败！对方返回结果：{}", triggerLabel, responseEntity.getBody());
                 throw new RuntimeException(responseEntity.getBody());
             }
         } catch (Exception e) {
-            log.error("==== callback ==== 回调钩子URL失败！", e);
+            log.error("==== CallbackHookTask[" + triggerLabel + "] callback ==== 回调钩子URL失败！", e);
             throw new RuntimeException(e);
         }
     }

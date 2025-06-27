@@ -40,17 +40,26 @@ public class OcrProcessTask implements Runnable {
      */
     private final Map<String, OcrSection> ocrRectMap;
 
-    public OcrProcessTask(OCRManager ocrManager, InferenceEngine ocrEngine, BufferedImage snapshotImage, Map<String, OcrSection> ocrRectMap) {
+    private final String triggerLabel;
+
+    private final boolean syncFlag;
+
+    public OcrProcessTask(String triggerLabel, OCRManager ocrManager, InferenceEngine ocrEngine, BufferedImage snapshotImage, Map<String, OcrSection> ocrRectMap, boolean syncFlag) {
+        log.info("==== OcrProcessTask[{}] ==== OCR处理任务初始化：开始！", triggerLabel);
+        this.triggerLabel = triggerLabel;
         this.ocrManager = ocrManager;
         this.snapshotImage = snapshotImage;
         this.ocrRectMap = ocrRectMap;
         this.ocrEngine = ocrEngine;
+        this.syncFlag = syncFlag;
+        log.info("==== OcrProcessTask[{}] ==== OCR处理任务初始化：完毕！", triggerLabel);
     }
 
     @Override
     public void run() {
+        log.info("==== OcrProcessTask[{}] ==== OCR处理任务：开始执行！", triggerLabel);
         String collectTime = DateUtils.nowStr();
-        log.info("==== OcrProcessTask ==== 开始OCR识别！当前时间：{}\n", collectTime);
+        log.info("==== OcrProcessTask[{}] ==== 开始OCR识别！当前时间：{}\n", triggerLabel, collectTime);
 
         // OCR识别各框选区域
         List<OcrSectionResult> resultList = new LinkedList<>();
@@ -68,25 +77,50 @@ public class OcrProcessTask implements Runnable {
 
                 // 执行OCR识别
                 OcrResult ocrResult = this.ocrEngine.runOcr(subFile.getPath());
-                log.info("==== OCR识别处理 ==== 截屏图片文件OCR识别成功，区域：{} ==> 识别结果：\n\n{}", key, ocrResult.getStrRes());
+                log.info("==== OcrProcessTask[{}] ==== 截屏图片文件OCR识别成功，区域：{} ==> 识别结果：\n\n{}",
+                        triggerLabel, key, ocrResult.getStrRes());
                 OcrSectionResult result = ocrSection.newResult(ocrResult, collectTime);
                 resultList.add(result);
 
                 // OCR识别结果更新到UI视图模型中
                 this.ocrManager.newResult(ocrSection.displayPosition(), result);
             } catch (Exception e) {
-                log.error("==== OCR识别处理 ==== 截屏图片文件OCR识别失败，捕获到异常！", e);
+                log.error("==== OcrProcessTask[" + triggerLabel + "] ==== 截屏图片文件OCR识别失败，捕获到异常！", e);
             }
         }
 
         // OCR识别结果保存到数据库
-        TaskExecutor.execute(this.ocrManager.createDatabaseOutputTask(resultList));
+        log.info("==== OcrProcessTask[{}] ==== 创建并启动数据库输出任务 DatabaseOutputTask 保存OCR识别结果", triggerLabel);
+        if (this.syncFlag) {
+            DatabaseOutputTask databaseOutputTask = this.ocrManager.createDatabaseOutputTask(triggerLabel, resultList);
+            if (null != databaseOutputTask) {
+                databaseOutputTask.run();
+            }
+        } else {
+            TaskExecutor.execute(this.ocrManager.createDatabaseOutputTask(triggerLabel, resultList));
+        }
 
         // OCR识别结果保存到文件
-        TaskExecutor.execute(this.ocrManager.createFileOutputTask(this.snapshotImage, resultList));
+        log.info("==== OcrProcessTask[{}] ==== 创建并启动文件输出任务 FileOutputTask 保存截屏图片和OCR识别结果", triggerLabel);
+        if (this.syncFlag) {
+            FileOutputTask fileOutputTask = this.ocrManager.createFileOutputTask(triggerLabel, this.snapshotImage, resultList);
+            if (null != fileOutputTask) {
+                fileOutputTask.run();
+            }
+        } else {
+            TaskExecutor.execute(this.ocrManager.createFileOutputTask(triggerLabel, this.snapshotImage, resultList));
+        }
 
         // OCR识别结果触发回调钩子
-        TaskExecutor.execute(this.ocrManager.createCallbackHookTask(resultList));
+        log.info("==== OcrProcessTask[{}] ==== 创建并启动URL回调任务 CallbackHookTask 发送OCR识别结果", triggerLabel);
+        if (this.syncFlag) {
+            CallbackHookTask callbackHookTask = this.ocrManager.createCallbackHookTask(triggerLabel, resultList);
+            if (null != callbackHookTask) {
+                callbackHookTask.run();
+            }
+        } else {
+            TaskExecutor.execute(this.ocrManager.createCallbackHookTask(triggerLabel, resultList));
+        }
     }
 
 }
