@@ -3,6 +3,7 @@ package cc.wangzijie.constants;
 public class ConfigKeys {
 
     public static final String KEY_INTERVAL_SECONDS = "intervalSeconds";
+    public static final String KEY_ASYNC_FLAG = "asyncFlag";
 
     public static final String KEY_OUTPUT_FOLDER_PATH = "outputFolderPath";
     public static final String KEY_OUTPUT_FOLDER_ENABLED_FLAG = "outputFolderEnabledFlag";

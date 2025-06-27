@@ -63,6 +63,11 @@ public class ScreenshotAreaModel {
             this.ocrManager.setIntervalSeconds(newValue.intValue());
         });
 
+        this.settingsWindowModel.asyncFlagProperty().addListener((observableValue, oldValue, newValue) -> {
+            log.info("==== 修改异步处理开关 ==== 设置AsyncFlag：{}", newValue ? "异步" : "同步");
+            this.ocrManager.setAsyncFlag(newValue);
+        });
+
         Runtime.getRuntime().addShutdownHook(new Thread(() -> {
             // 清理代码，例如关闭数据库连接、停止线程等
             this.ocrManager.stop();

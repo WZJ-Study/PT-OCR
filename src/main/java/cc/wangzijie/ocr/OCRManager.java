@@ -99,6 +99,8 @@ public class OCRManager {
     private final AtomicInteger countDownSeconds;
 
     private volatile boolean running;
+    private volatile boolean asyncFlag;
+    private SnapshotTask snapshotTask;
 
     public OCRManager(ScreenshotAreaModel screenshotAreaModel, DataListAreaModel dataListAreaModel, MainWindowModel mainWindowModel, SettingsWindowModel settingsWindowModel, IOcrSectionResultService ocrSectionResultService, ServerConfig serverConfig, RestTemplate restTemplate) {
         this.screenshotAreaModel = screenshotAreaModel;
@@ -115,6 +117,8 @@ public class OCRManager {
         this.ocrSectionMap = new ConcurrentHashMap<>();
         // 设置运行标志=已停止
         this.running = false;
+        // 异步处理开关
+        this.asyncFlag = settingsWindowModel.isAsyncFlag();
     }
 
     /**
@@ -125,12 +129,11 @@ public class OCRManager {
             return;
         }
         log.info("==== OCRManager ==== 开始运行！");
-        boolean syncFlag = true;
 
         // 开始定时截屏采集
         log.info("==== OCRManager ==== 创建截屏采集定时任务 SnapshotTask 定时采集截屏图片（时间间隔：{}秒）", intervalSeconds);
-        SnapshotTask snapshotTask = new SnapshotTask(this.screenshotAreaModel, this, this.screenshotAreaModel.getScreenshotArea(), syncFlag);
-        this.scheduledFuture = TaskExecutor.scheduleWithFixedDelay(snapshotTask, intervalSeconds, intervalSeconds, TimeUnit.SECONDS);
+        this.snapshotTask = new SnapshotTask(this.screenshotAreaModel, this, this.screenshotAreaModel.getScreenshotArea(), this.asyncFlag);
+        this.scheduledFuture = TaskExecutor.scheduleAtFixedRate(snapshotTask, intervalSeconds, intervalSeconds, TimeUnit.SECONDS);
 
         // 开始倒计时
         log.info("==== OCRManager ==== 创建屏幕倒计时定时任务 scheduleAtFixedRate 每秒一次刷新屏幕倒计时");
@@ -169,6 +172,10 @@ public class OCRManager {
                 log.info("==== OCRManager ==== 停止屏幕倒计时定时任务！");
             }
         }
+        // 任务指针清空
+        if (null != this.snapshotTask) {
+            this.snapshotTask = null;
+        }
         // 设置运行标志=已停止
         log.info("==== OCRManager ==== 设置运行标志=已停止");
         this.running = false;
@@ -181,6 +188,14 @@ public class OCRManager {
 
     public synchronized void setIntervalSeconds(int intervalSeconds) {
         this.intervalSeconds = intervalSeconds;
+    }
+
+    public synchronized void setAsyncFlag(boolean asyncFlag) {
+        this.asyncFlag = asyncFlag;
+        if (null != this.snapshotTask) {
+            log.info("==== OCRManager ==== SnapshotTask 设置异步处理开关：{}", asyncFlag);
+            this.snapshotTask.setAsyncFlag(asyncFlag);
+        }
     }
 
     public synchronized void addOcrSection(OcrSection ocrSection) {
@@ -219,9 +234,9 @@ public class OCRManager {
         this.dataListAreaModel.addData(key, result);
     }
 
-    public OcrProcessTask createOcrProcessTask(String triggerLabel, BufferedImage screenshot, boolean syncFlag) {
+    public OcrProcessTask createOcrProcessTask(String triggerLabel, BufferedImage screenshot, boolean asyncFlag) {
         log.info("==== OCRManager ==== 创建OCR处理任务 OcrProcessTask[{}] 处理截屏图片", triggerLabel);
-        return new OcrProcessTask(triggerLabel, this, this.ocrEngine, screenshot, this.ocrSectionMap, syncFlag);
+        return new OcrProcessTask(triggerLabel, this, this.ocrEngine, screenshot, this.ocrSectionMap, asyncFlag);
     }
 
     public FileOutputTask createFileOutputTask(String triggerLabel, BufferedImage screenshot, List<OcrSectionResult> resultList) {

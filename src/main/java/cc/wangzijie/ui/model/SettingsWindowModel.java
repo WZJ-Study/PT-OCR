@@ -28,6 +28,7 @@ public class SettingsWindowModel {
     private final ObjectProperty<Image> applySettingButtonImage = new SimpleObjectProperty<>();
 
     private final IntegerProperty intervalSeconds = new SimpleIntegerProperty();
+    private final BooleanProperty asyncFlag = new SimpleBooleanProperty(true);
 
     private final StringProperty outputFolderPath = new SimpleStringProperty();
     private final BooleanProperty outputFolderEnabledFlag = new SimpleBooleanProperty(true);
@@ -344,4 +345,15 @@ public class SettingsWindowModel {
     }
 
 
+    public boolean isAsyncFlag() {
+        return asyncFlag.get();
+    }
+
+    public BooleanProperty asyncFlagProperty() {
+        return asyncFlag;
+    }
+
+    public void setAsyncFlag(boolean syncFlag) {
+        this.asyncFlag.set(syncFlag);
+    }
 }

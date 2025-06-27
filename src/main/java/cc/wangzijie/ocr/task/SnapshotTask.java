@@ -7,6 +7,7 @@ import cc.wangzijie.ui.utils.AwtRobotUtils;
 import cc.wangzijie.utils.DateFormat;
 import cc.wangzijie.utils.DateUtils;
 import javafx.scene.shape.Rectangle;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
 import java.awt.image.BufferedImage;
@@ -26,16 +27,18 @@ public class SnapshotTask implements Runnable {
 
     private final Rectangle snapshotRect;
 
-    private final boolean syncFlag;
+    @Setter
+    private boolean asyncFlag;
 
-    public SnapshotTask(ScreenshotAreaModel screenshotAreaModel, OCRManager ocrManager, Rectangle snapshotRect, boolean syncFlag) {
+    public SnapshotTask(ScreenshotAreaModel screenshotAreaModel, OCRManager ocrManager, Rectangle snapshotRect, boolean asyncFlag) {
         log.info("==== SnapshotTask ==== 截屏任务初始化：开始！");
         this.screenshotAreaModel = screenshotAreaModel;
         this.ocrManager = ocrManager;
         this.snapshotRect = snapshotRect;
-        this.syncFlag = syncFlag;
+        this.asyncFlag = asyncFlag;
         log.info("==== SnapshotTask ==== 截屏任务初始化：完毕！");
     }
+
 
     @Override
     public void run() {
@@ -49,18 +52,20 @@ public class SnapshotTask implements Runnable {
         this.screenshotAreaModel.setScreenshot(screenshot);
         log.info("==== SnapshotTask[{}] ==== 截屏图片存储到screenshotAreaModel中，以显示预览", triggerLabel);
         // 启动处理任务
-        if (this.syncFlag) {
-            // 同步执行
-            log.info("==== SnapshotTask[{}] ==== 创建并启动OCR处理任务 OcrProcessTask 处理截屏图片", triggerLabel);
-            OcrProcessTask ocrProcessTask = this.ocrManager.createOcrProcessTask(triggerLabel, screenshot, this.syncFlag);
-            if (null != ocrProcessTask) {
-                ocrProcessTask.run();
-            }
-        } else {
-            // 异步执行
-            log.info("==== SnapshotTask[{}] ==== 创建并启动OCR处理任务 OcrProcessTask 处理截屏图片", triggerLabel);
-            TaskExecutor.execute(this.ocrManager.createOcrProcessTask(triggerLabel, screenshot, this.syncFlag));
-        }
+//        if (this.asyncFlag) {
+//            // 异步执行
+//            log.info("==== SnapshotTask[{}] ==== 创建并启动OCR处理任务 OcrProcessTask 处理截屏图片", triggerLabel);
+//            TaskExecutor.execute(this.ocrManager.createOcrProcessTask(triggerLabel, screenshot, this.asyncFlag));
+//        } else {
+//            // 同步执行
+//            log.info("==== SnapshotTask[{}] ==== 创建并启动OCR处理任务 OcrProcessTask 处理截屏图片", triggerLabel);
+//            OcrProcessTask ocrProcessTask = this.ocrManager.createOcrProcessTask(triggerLabel, screenshot, this.asyncFlag);
+//            if (null != ocrProcessTask) {
+//                ocrProcessTask.run();
+//            }
+//        }
+        log.info("==== SnapshotTask[{}] ==== 创建并启动OCR处理任务 OcrProcessTask 处理截屏图片", triggerLabel);
+        TaskExecutor.execute(this.ocrManager.createOcrProcessTask(triggerLabel, screenshot, this.asyncFlag));
     }
 
 }

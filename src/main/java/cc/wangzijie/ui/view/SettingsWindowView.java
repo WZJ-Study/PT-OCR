@@ -56,6 +56,8 @@ public class SettingsWindowView implements Initializable {
 
     @FXML
     public TextField intervalSecondsInput;
+    @FXML
+    public CheckBox asyncFlagInput;
 
     @FXML
     public TextField outputFolderPathInput;
@@ -122,6 +124,19 @@ public class SettingsWindowView implements Initializable {
         intervalSecondsInput.setText(intervalSeconds);
         settingsWindowModel.setIntervalSeconds(Integer.parseInt(intervalSeconds));
         log.info("==== 初始化【设置】窗口 ==== 定时采集间隔（秒）：{}", intervalSeconds);
+
+
+        // 设置#1.异步处理开关 - 是否启用
+        String asyncFlag = configManager.getProperty(ConfigKeys.KEY_ASYNC_FLAG);
+        if (StringUtils.isBlank(asyncFlag)) {
+            asyncFlag = Constants.TRUE;
+            configManager.setProperty(ConfigKeys.KEY_ASYNC_FLAG, asyncFlag);
+            savePropertiesFlag = true;
+        }
+        asyncFlagInput.setSelected(Objects.equals(asyncFlag, Constants.TRUE));
+        settingsWindowModel.setOutputFolderEnabledFlag(Objects.equals(asyncFlag, Constants.TRUE));
+        log.info("==== 初始化【设置】窗口 ==== 异步处理开关 - 是否启用：{}", asyncFlag);
+
 
         // 设置#2.输出文件夹路径
         String outputFolderPath = configManager.getProperty(ConfigKeys.KEY_OUTPUT_FOLDER_PATH);
@@ -306,6 +321,13 @@ public class SettingsWindowView implements Initializable {
         settingsWindowModel.setIntervalSeconds(intervalSeconds);
         configManager.setProperty(ConfigKeys.KEY_INTERVAL_SECONDS, intervalSecondsText);
         log.info("==== 应用设置 ==== 定时采集间隔（秒）：{}", intervalSeconds);
+
+        // 设置#1.异步处理开关 - 是否启用
+        boolean asyncFlag = asyncFlagInput.isSelected();
+        settingsWindowModel.setAsyncFlag(asyncFlag);
+        configManager.setProperty(ConfigKeys.KEY_ASYNC_FLAG, asyncFlag ? Constants.TRUE : Constants.FALSE);
+        log.info("==== 应用设置 ==== 异步处理开关 - 是否启用：{}", asyncFlag);
+
 
         // 设置#2.输出文件夹路径
         String outputFolderPath = this.processOutputFolderPathInput(outputFolderPathInput.getText());

@@ -42,16 +42,16 @@ public class OcrProcessTask implements Runnable {
 
     private final String triggerLabel;
 
-    private final boolean syncFlag;
+    private final boolean asyncFlag;
 
-    public OcrProcessTask(String triggerLabel, OCRManager ocrManager, InferenceEngine ocrEngine, BufferedImage snapshotImage, Map<String, OcrSection> ocrRectMap, boolean syncFlag) {
+    public OcrProcessTask(String triggerLabel, OCRManager ocrManager, InferenceEngine ocrEngine, BufferedImage snapshotImage, Map<String, OcrSection> ocrRectMap, boolean asyncFlag) {
         log.info("==== OcrProcessTask[{}] ==== OCR处理任务初始化：开始！", triggerLabel);
         this.triggerLabel = triggerLabel;
         this.ocrManager = ocrManager;
         this.snapshotImage = snapshotImage;
         this.ocrRectMap = ocrRectMap;
         this.ocrEngine = ocrEngine;
-        this.syncFlag = syncFlag;
+        this.asyncFlag = asyncFlag;
         log.info("==== OcrProcessTask[{}] ==== OCR处理任务初始化：完毕！", triggerLabel);
     }
 
@@ -91,35 +91,36 @@ public class OcrProcessTask implements Runnable {
 
         // OCR识别结果保存到数据库
         log.info("==== OcrProcessTask[{}] ==== 创建并启动数据库输出任务 DatabaseOutputTask 保存OCR识别结果", triggerLabel);
-        if (this.syncFlag) {
-            DatabaseOutputTask databaseOutputTask = this.ocrManager.createDatabaseOutputTask(triggerLabel, resultList);
-            if (null != databaseOutputTask) {
+        DatabaseOutputTask databaseOutputTask = this.ocrManager.createDatabaseOutputTask(triggerLabel, resultList);
+        if (null != databaseOutputTask) {
+            if (this.asyncFlag) {
+                TaskExecutor.execute(databaseOutputTask);
+            } else {
                 databaseOutputTask.run();
             }
-        } else {
-            TaskExecutor.execute(this.ocrManager.createDatabaseOutputTask(triggerLabel, resultList));
         }
+
 
         // OCR识别结果保存到文件
         log.info("==== OcrProcessTask[{}] ==== 创建并启动文件输出任务 FileOutputTask 保存截屏图片和OCR识别结果", triggerLabel);
-        if (this.syncFlag) {
-            FileOutputTask fileOutputTask = this.ocrManager.createFileOutputTask(triggerLabel, this.snapshotImage, resultList);
-            if (null != fileOutputTask) {
+        FileOutputTask fileOutputTask = this.ocrManager.createFileOutputTask(triggerLabel, this.snapshotImage, resultList);
+        if (null != fileOutputTask) {
+            if (this.asyncFlag) {
+                TaskExecutor.execute(fileOutputTask);
+            } else {
                 fileOutputTask.run();
             }
-        } else {
-            TaskExecutor.execute(this.ocrManager.createFileOutputTask(triggerLabel, this.snapshotImage, resultList));
         }
 
         // OCR识别结果触发回调钩子
         log.info("==== OcrProcessTask[{}] ==== 创建并启动URL回调任务 CallbackHookTask 发送OCR识别结果", triggerLabel);
-        if (this.syncFlag) {
-            CallbackHookTask callbackHookTask = this.ocrManager.createCallbackHookTask(triggerLabel, resultList);
-            if (null != callbackHookTask) {
+        CallbackHookTask callbackHookTask = this.ocrManager.createCallbackHookTask(triggerLabel, resultList);
+        if (null != callbackHookTask) {
+            if (this.asyncFlag) {
+                TaskExecutor.execute(callbackHookTask);
+            } else {
                 callbackHookTask.run();
             }
-        } else {
-            TaskExecutor.execute(this.ocrManager.createCallbackHookTask(triggerLabel, resultList));
         }
     }
 

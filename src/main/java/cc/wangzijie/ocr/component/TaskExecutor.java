@@ -42,6 +42,10 @@ public class TaskExecutor {
      * @param task 任务
      */
     public static void execute(Runnable task) {
+        if (EXECUTOR_SERVICE.isShutdown() || EXECUTOR_SERVICE.isTerminated()) {
+            log.info("==== execute ==== 线程池 EXECUTOR_SERVICE 已关闭或已终止");
+            throw new RuntimeException("线程池 EXECUTOR_SERVICE 已关闭或已终止!");
+        }
         EXECUTOR_SERVICE.submit(task);
     }
 
@@ -52,6 +56,10 @@ public class TaskExecutor {
      * @return Future结果
      */
     public static Future<?> run(Runnable task) {
+        if (EXECUTOR_SERVICE.isShutdown() || EXECUTOR_SERVICE.isTerminated()) {
+            log.info("==== run ==== 线程池 EXECUTOR_SERVICE 已关闭或已终止");
+            throw new RuntimeException("线程池 EXECUTOR_SERVICE 已关闭或已终止!");
+        }
         return EXECUTOR_SERVICE.submit(task);
     }
 
@@ -63,6 +71,10 @@ public class TaskExecutor {
      * @return ScheduledFuture结果
      */
     public static ScheduledFuture<?> scheduleWithFixedDelay(Runnable task, int initialDelay, int delay, TimeUnit timeUnit) {
+        if (SCHEDULED_EXECUTOR_SERVICE.isShutdown() || SCHEDULED_EXECUTOR_SERVICE.isTerminated()) {
+            log.info("==== scheduleWithFixedDelay ==== 线程池 SCHEDULED_EXECUTOR_SERVICE 已关闭或已终止");
+            throw new RuntimeException("线程池 SCHEDULED_EXECUTOR_SERVICE 已关闭或已终止!");
+        }
         return SCHEDULED_EXECUTOR_SERVICE.scheduleWithFixedDelay(task, initialDelay, delay, timeUnit);
     }
 
@@ -73,6 +85,10 @@ public class TaskExecutor {
      * @return ScheduledFuture结果
      */
     public static ScheduledFuture<?> scheduleAtFixedRate(Runnable task, int initialDelay, int period, TimeUnit timeUnit) {
+        if (SCHEDULED_EXECUTOR_SERVICE.isShutdown() || SCHEDULED_EXECUTOR_SERVICE.isTerminated()) {
+            log.info("==== scheduleAtFixedRate ==== 线程池 SCHEDULED_EXECUTOR_SERVICE 已关闭或已终止");
+            throw new RuntimeException("线程池 SCHEDULED_EXECUTOR_SERVICE 已关闭或已终止!");
+        }
         return SCHEDULED_EXECUTOR_SERVICE.scheduleAtFixedRate(task, initialDelay, period, timeUnit);
     }
 
