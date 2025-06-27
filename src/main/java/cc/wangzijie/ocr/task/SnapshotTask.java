@@ -2,7 +2,6 @@ package cc.wangzijie.ocr.task;
 
 import cc.wangzijie.ocr.OCRManager;
 import cc.wangzijie.ocr.component.TaskExecutor;
-import cc.wangzijie.ocr.task.sync.OcrProcessSyncTask;
 import cc.wangzijie.ui.model.ScreenshotAreaModel;
 import cc.wangzijie.ui.utils.AwtRobotUtils;
 import cc.wangzijie.utils.DateFormat;
